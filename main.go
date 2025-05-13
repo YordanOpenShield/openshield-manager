@@ -22,6 +22,11 @@ func main() {
 		jobs := apiGroup.Group("/jobs")
 		{
 			jobs.GET("/available", api.GetAvailableJobs)
+			jobs.POST("/create", api.CreateJob)
+		}
+		tasks := apiGroup.Group("/tasks")
+		{
+			tasks.POST("/assign", api.AssignTaskToAgent)
 		}
 	}
 

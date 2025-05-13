@@ -1,0 +1,75 @@
+package api
+
+import (
+	"net/http"
+	"openshield-manager/internal/db"
+	grpcclient "openshield-manager/internal/grpc"
+	"openshield-manager/internal/models"
+	"openshield-manager/proto"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
+
+type AssignTaskToAgentRequest struct {
+	AgentID string `json:"agent_id" binding:"required"`
+	JobID   string `json:"job_id" binding:"required"`
+}
+
+func AssignTaskToAgent(c *gin.Context) {
+	var req AssignTaskToAgentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		return
+	}
+
+	// Check if the agent exists
+	var agent models.Agent
+	if err := db.DB.Where("id = ?", req.AgentID).First(&agent).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
+		return
+	}
+
+	// Check if the job exists
+	var job models.Job
+	if err := db.DB.Where("id = ?", req.JobID).First(&job).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
+		return
+	}
+
+	// Store task in DB
+	task := models.Task{
+		ID:      uuid.New(),
+		JobID:   job.ID,
+		AgentID: agent.ID,
+	}
+	if err := db.DB.Create(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create task: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, job)
+
+	// Send task to agent
+	client, err := grpcclient.NewAgentClient(agent.Address)
+	if err != nil {
+		// Handle the error appropriately, e.g., log or return a response
+		// For now, just log and return
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create gRPC client: " + err.Error()})
+		return
+	}
+	// Use the client to send the task to the agent
+	protoTask := &proto.Task{
+		Id:      task.ID.String(),
+		JobId:   task.JobID.String(),
+		AgentId: task.AgentID.String(),
+	}
+	// Convert models.Job to proto.Job
+	protoJob := &proto.Job{
+		Id:          job.ID.String(),
+		Name:        job.Name,
+		Description: job.Description,
+		Command:     job.Command,
+	}
+	client.SendTask(c, protoTask, protoJob)
+}

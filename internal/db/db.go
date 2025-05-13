@@ -42,7 +42,7 @@ func ConnectDatabase() {
 		log.Println("Connected to SQLite (development)")
 	}
 
-	err = DB.AutoMigrate(&models.Agent{}, &models.Job{})
+	err = DB.AutoMigrate(&models.Agent{}, &models.Job{}, &models.Task{})
 	if err != nil {
 		log.Fatalf("auto-migration failed: %v", err)
 	}

@@ -7,6 +7,7 @@ import (
 	"openshield-manager/internal/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func GetAvailableJobs(c *gin.Context) {
@@ -15,25 +16,30 @@ func GetAvailableJobs(c *gin.Context) {
 	c.JSON(http.StatusOK, jobs)
 }
 
-type AssignJobToAgentRequest struct {
-	AgentID string `json:"id" binding:"required"`
+type CreateJobRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Command     string `json:"command"`
 }
 
-func AssignJobToAgent(c *gin.Context) {
-	var req AssignJobToAgentRequest
-
-	// Parse the request body
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+func CreateJob(c *gin.Context) {
+	var req CreateJobRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
-	// Check if the agent exists
-	var agent models.Agent
-	if err := db.DB.Where("id = ?", req.AgentID).First(&agent).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
+	// Create job in DB
+	job := models.Job{
+		ID:          uuid.New(),
+		Name:        req.Name,
+		Description: req.Description,
+		Command:     req.Command,
+	}
+	if err := db.DB.Create(&job).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create job: " + err.Error()})
 		return
 	}
 
-	// TODO: Publish job to agent's Redis channel
+	c.JSON(http.StatusCreated, job)
 }

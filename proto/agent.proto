@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = "proto/";
+
+message Job {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string command = 4;
+}
+
+message Task {
+  string id = 1;
+  string job_id = 2;
+  string agent_id = 3;
+  TaskStatus status = 4;
+  string result = 5;
+}
+
+enum TaskStatus {
+  PENDING = 0;
+  RUNNING = 1;
+  COMPLETED = 2;
+  FAILED = 3;
+}
+
+message AssignTaskRequest {
+  Task task = 1;
+  Job job = 2;
+}
+
+message AssignTaskResponse {
+  bool accepted = 1;
+  string message = 2;
+}
+
+// Service for agent communication
+service AgentTaskService {
+  rpc AssignTask (AssignTaskRequest) returns (AssignTaskResponse);
+}

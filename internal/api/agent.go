@@ -29,9 +29,8 @@ type UnregisterRequest struct {
 
 func UnregisterAgent(c *gin.Context) {
 	var req UnregisterRequest
-
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 		return
 	}
 
