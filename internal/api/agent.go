@@ -11,15 +11,35 @@ import (
 	"github.com/google/uuid"
 )
 
+type RegisterRequest struct {
+	DeviceID string `json:"device_id" binding:"required"`
+}
+
 func RegisterAgent(c *gin.Context) {
+	var req RegisterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
+		return
+	}
+
+	// Check if an agent with this DeviceID already exists
+	var existing models.Agent
+	if err := db.DB.Where("device_id = ?", req.DeviceID).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Agent already registered on this device"})
+		return
+	}
+	// Create a new agent
 	agentID := uuid.New()
 	agent := models.Agent{
 		ID:       agentID,
 		Token:    uuid.New().String(),
 		LastSeen: time.Now(),
+		DeviceID: req.DeviceID,
+		State:    "DISCONNECTED",
 	}
 
 	db.DB.Create(&agent)
+
 	c.JSON(http.StatusOK, gin.H{"id": agent.ID, "token": agent.Token})
 }
 
@@ -40,7 +60,8 @@ func UnregisterAgent(c *gin.Context) {
 		return
 	}
 
-	if err := db.DB.Delete(&agent).Error; err != nil {
+	agent.State = "UNREGISTERED"
+	if err := db.DB.Save(&agent).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister agent"})
 		return
 	}
@@ -49,7 +70,8 @@ func UnregisterAgent(c *gin.Context) {
 }
 
 type HeartbeatRequest struct {
-	ID string `json:"id" binding:"required"`
+	ID      string `json:"id" binding:"required"`
+	Address string `json:"address" binding:"required"`
 }
 
 func AgentHeartbeat(c *gin.Context) {
@@ -70,9 +92,10 @@ func AgentHeartbeat(c *gin.Context) {
 
 	// Update the agent’s last heartbeat timestamp
 	agent.LastSeen = time.Now()
+	agent.Address = req.Address
+	agent.State = "CONNECTED"
 	db.DB.Save(&agent)
 
 	// Respond with a success message
-	// c.JSON(http.StatusOK, gin.H{"status": "heartbeat received"})
 	c.Status(http.StatusOK)
 }

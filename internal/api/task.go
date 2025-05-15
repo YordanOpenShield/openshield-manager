@@ -6,6 +6,7 @@ import (
 	grpcclient "openshield-manager/internal/grpc"
 	"openshield-manager/internal/models"
 	"openshield-manager/proto"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -48,8 +49,6 @@ func AssignTaskToAgent(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, job)
-
 	// Send task to agent
 	client, err := grpcclient.NewAgentClient(agent.Address)
 	if err != nil {
@@ -72,4 +71,9 @@ func AssignTaskToAgent(c *gin.Context) {
 		Command:     job.Command,
 	}
 	client.SendTask(c, protoTask, protoJob)
+
+	c.JSON(http.StatusCreated, job)
+
+	go grpcclient.TrackTaskStatus(agent.Address, task.ID.String(), job.ID.String(), 1*time.Second)
+
 }

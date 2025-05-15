@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,105 +20,261 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AgentTaskService_AssignTask_FullMethodName = "/AgentTaskService/AssignTask"
+	AgentService_AssignTask_FullMethodName         = "/AgentService/AssignTask"
+	AgentService_ReportTaskStatus_FullMethodName   = "/AgentService/ReportTaskStatus"
+	AgentService_GetScriptChecksums_FullMethodName = "/AgentService/GetScriptChecksums"
+	AgentService_SendScriptFile_FullMethodName     = "/AgentService/SendScriptFile"
+	AgentService_DeleteScriptFile_FullMethodName   = "/AgentService/DeleteScriptFile"
 )
 
-// AgentTaskServiceClient is the client API for AgentTaskService service.
+// AgentServiceClient is the client API for AgentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // Service for agent communication
-type AgentTaskServiceClient interface {
+type AgentServiceClient interface {
+	// Tasks
 	AssignTask(ctx context.Context, in *AssignTaskRequest, opts ...grpc.CallOption) (*AssignTaskResponse, error)
+	ReportTaskStatus(ctx context.Context, in *JobStatusRequest, opts ...grpc.CallOption) (*JobStatusResponse, error)
+	// Scripts
+	GetScriptChecksums(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChecksumResponse, error)
+	SendScriptFile(ctx context.Context, in *FileContent, opts ...grpc.CallOption) (*SyncStatus, error)
+	DeleteScriptFile(ctx context.Context, in *DeleteScriptRequest, opts ...grpc.CallOption) (*SyncStatus, error)
 }
 
-type agentTaskServiceClient struct {
+type agentServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAgentTaskServiceClient(cc grpc.ClientConnInterface) AgentTaskServiceClient {
-	return &agentTaskServiceClient{cc}
+func NewAgentServiceClient(cc grpc.ClientConnInterface) AgentServiceClient {
+	return &agentServiceClient{cc}
 }
 
-func (c *agentTaskServiceClient) AssignTask(ctx context.Context, in *AssignTaskRequest, opts ...grpc.CallOption) (*AssignTaskResponse, error) {
+func (c *agentServiceClient) AssignTask(ctx context.Context, in *AssignTaskRequest, opts ...grpc.CallOption) (*AssignTaskResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AssignTaskResponse)
-	err := c.cc.Invoke(ctx, AgentTaskService_AssignTask_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AgentService_AssignTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AgentTaskServiceServer is the server API for AgentTaskService service.
-// All implementations must embed UnimplementedAgentTaskServiceServer
+func (c *agentServiceClient) ReportTaskStatus(ctx context.Context, in *JobStatusRequest, opts ...grpc.CallOption) (*JobStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(JobStatusResponse)
+	err := c.cc.Invoke(ctx, AgentService_ReportTaskStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) GetScriptChecksums(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChecksumResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChecksumResponse)
+	err := c.cc.Invoke(ctx, AgentService_GetScriptChecksums_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) SendScriptFile(ctx context.Context, in *FileContent, opts ...grpc.CallOption) (*SyncStatus, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SyncStatus)
+	err := c.cc.Invoke(ctx, AgentService_SendScriptFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) DeleteScriptFile(ctx context.Context, in *DeleteScriptRequest, opts ...grpc.CallOption) (*SyncStatus, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SyncStatus)
+	err := c.cc.Invoke(ctx, AgentService_DeleteScriptFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AgentServiceServer is the server API for AgentService service.
+// All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
 //
 // Service for agent communication
-type AgentTaskServiceServer interface {
+type AgentServiceServer interface {
+	// Tasks
 	AssignTask(context.Context, *AssignTaskRequest) (*AssignTaskResponse, error)
-	mustEmbedUnimplementedAgentTaskServiceServer()
+	ReportTaskStatus(context.Context, *JobStatusRequest) (*JobStatusResponse, error)
+	// Scripts
+	GetScriptChecksums(context.Context, *emptypb.Empty) (*ChecksumResponse, error)
+	SendScriptFile(context.Context, *FileContent) (*SyncStatus, error)
+	DeleteScriptFile(context.Context, *DeleteScriptRequest) (*SyncStatus, error)
+	mustEmbedUnimplementedAgentServiceServer()
 }
 
-// UnimplementedAgentTaskServiceServer must be embedded to have
+// UnimplementedAgentServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedAgentTaskServiceServer struct{}
+type UnimplementedAgentServiceServer struct{}
 
-func (UnimplementedAgentTaskServiceServer) AssignTask(context.Context, *AssignTaskRequest) (*AssignTaskResponse, error) {
+func (UnimplementedAgentServiceServer) AssignTask(context.Context, *AssignTaskRequest) (*AssignTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AssignTask not implemented")
 }
-func (UnimplementedAgentTaskServiceServer) mustEmbedUnimplementedAgentTaskServiceServer() {}
-func (UnimplementedAgentTaskServiceServer) testEmbeddedByValue()                          {}
+func (UnimplementedAgentServiceServer) ReportTaskStatus(context.Context, *JobStatusRequest) (*JobStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReportTaskStatus not implemented")
+}
+func (UnimplementedAgentServiceServer) GetScriptChecksums(context.Context, *emptypb.Empty) (*ChecksumResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetScriptChecksums not implemented")
+}
+func (UnimplementedAgentServiceServer) SendScriptFile(context.Context, *FileContent) (*SyncStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendScriptFile not implemented")
+}
+func (UnimplementedAgentServiceServer) DeleteScriptFile(context.Context, *DeleteScriptRequest) (*SyncStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteScriptFile not implemented")
+}
+func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
+func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
 
-// UnsafeAgentTaskServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AgentTaskServiceServer will
+// UnsafeAgentServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AgentServiceServer will
 // result in compilation errors.
-type UnsafeAgentTaskServiceServer interface {
-	mustEmbedUnimplementedAgentTaskServiceServer()
+type UnsafeAgentServiceServer interface {
+	mustEmbedUnimplementedAgentServiceServer()
 }
 
-func RegisterAgentTaskServiceServer(s grpc.ServiceRegistrar, srv AgentTaskServiceServer) {
-	// If the following call pancis, it indicates UnimplementedAgentTaskServiceServer was
+func RegisterAgentServiceServer(s grpc.ServiceRegistrar, srv AgentServiceServer) {
+	// If the following call pancis, it indicates UnimplementedAgentServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&AgentTaskService_ServiceDesc, srv)
+	s.RegisterService(&AgentService_ServiceDesc, srv)
 }
 
-func _AgentTaskService_AssignTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_AssignTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AssignTaskRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentTaskServiceServer).AssignTask(ctx, in)
+		return srv.(AgentServiceServer).AssignTask(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AgentTaskService_AssignTask_FullMethodName,
+		FullMethod: AgentService_AssignTask_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentTaskServiceServer).AssignTask(ctx, req.(*AssignTaskRequest))
+		return srv.(AgentServiceServer).AssignTask(ctx, req.(*AssignTaskRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AgentTaskService_ServiceDesc is the grpc.ServiceDesc for AgentTaskService service.
+func _AgentService_ReportTaskStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).ReportTaskStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_ReportTaskStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).ReportTaskStatus(ctx, req.(*JobStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_GetScriptChecksums_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).GetScriptChecksums(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_GetScriptChecksums_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).GetScriptChecksums(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_SendScriptFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileContent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).SendScriptFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_SendScriptFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).SendScriptFile(ctx, req.(*FileContent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_DeleteScriptFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteScriptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).DeleteScriptFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_DeleteScriptFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).DeleteScriptFile(ctx, req.(*DeleteScriptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AgentTaskService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "AgentTaskService",
-	HandlerType: (*AgentTaskServiceServer)(nil),
+var AgentService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "AgentService",
+	HandlerType: (*AgentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "AssignTask",
-			Handler:    _AgentTaskService_AssignTask_Handler,
+			Handler:    _AgentService_AssignTask_Handler,
+		},
+		{
+			MethodName: "ReportTaskStatus",
+			Handler:    _AgentService_ReportTaskStatus_Handler,
+		},
+		{
+			MethodName: "GetScriptChecksums",
+			Handler:    _AgentService_GetScriptChecksums_Handler,
+		},
+		{
+			MethodName: "SendScriptFile",
+			Handler:    _AgentService_SendScriptFile_Handler,
+		},
+		{
+			MethodName: "DeleteScriptFile",
+			Handler:    _AgentService_DeleteScriptFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

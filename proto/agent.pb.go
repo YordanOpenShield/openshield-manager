@@ -9,6 +9,7 @@ package proto
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -321,11 +322,359 @@ func (x *AssignTaskResponse) GetMessage() string {
 	return ""
 }
 
+type JobStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *JobStatusRequest) Reset() {
+	*x = JobStatusRequest{}
+	mi := &file_proto_agent_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JobStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JobStatusRequest) ProtoMessage() {}
+
+func (x *JobStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JobStatusRequest.ProtoReflect.Descriptor instead.
+func (*JobStatusRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *JobStatusRequest) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+type JobStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Status        TaskStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=TaskStatus" json:"status,omitempty"`
+	Result        string                 `protobuf:"bytes,3,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *JobStatusResponse) Reset() {
+	*x = JobStatusResponse{}
+	mi := &file_proto_agent_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JobStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JobStatusResponse) ProtoMessage() {}
+
+func (x *JobStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JobStatusResponse.ProtoReflect.Descriptor instead.
+func (*JobStatusResponse) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *JobStatusResponse) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *JobStatusResponse) GetStatus() TaskStatus {
+	if x != nil {
+		return x.Status
+	}
+	return TaskStatus_PENDING
+}
+
+func (x *JobStatusResponse) GetResult() string {
+	if x != nil {
+		return x.Result
+	}
+	return ""
+}
+
+type ScriptChecksum struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	Checksum      string                 `protobuf:"bytes,2,opt,name=checksum,proto3" json:"checksum,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ScriptChecksum) Reset() {
+	*x = ScriptChecksum{}
+	mi := &file_proto_agent_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScriptChecksum) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScriptChecksum) ProtoMessage() {}
+
+func (x *ScriptChecksum) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScriptChecksum.ProtoReflect.Descriptor instead.
+func (*ScriptChecksum) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ScriptChecksum) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *ScriptChecksum) GetChecksum() string {
+	if x != nil {
+		return x.Checksum
+	}
+	return ""
+}
+
+type ChecksumResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Scripts       []*ScriptChecksum      `protobuf:"bytes,1,rep,name=scripts,proto3" json:"scripts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChecksumResponse) Reset() {
+	*x = ChecksumResponse{}
+	mi := &file_proto_agent_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChecksumResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChecksumResponse) ProtoMessage() {}
+
+func (x *ChecksumResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChecksumResponse.ProtoReflect.Descriptor instead.
+func (*ChecksumResponse) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ChecksumResponse) GetScripts() []*ScriptChecksum {
+	if x != nil {
+		return x.Scripts
+	}
+	return nil
+}
+
+type FileContent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileContent) Reset() {
+	*x = FileContent{}
+	mi := &file_proto_agent_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileContent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileContent) ProtoMessage() {}
+
+func (x *FileContent) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileContent.ProtoReflect.Descriptor instead.
+func (*FileContent) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *FileContent) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *FileContent) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type SyncStatus struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SyncStatus) Reset() {
+	*x = SyncStatus{}
+	mi := &file_proto_agent_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SyncStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SyncStatus) ProtoMessage() {}
+
+func (x *SyncStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SyncStatus.ProtoReflect.Descriptor instead.
+func (*SyncStatus) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SyncStatus) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *SyncStatus) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type DeleteScriptRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteScriptRequest) Reset() {
+	*x = DeleteScriptRequest{}
+	mi := &file_proto_agent_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteScriptRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteScriptRequest) ProtoMessage() {}
+
+func (x *DeleteScriptRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteScriptRequest.ProtoReflect.Descriptor instead.
+func (*DeleteScriptRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteScriptRequest) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
 var File_proto_agent_proto protoreflect.FileDescriptor
 
 const file_proto_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x11proto/agent.proto\"e\n" +
+	"\x11proto/agent.proto\x1a\x1bgoogle/protobuf/empty.proto\"e\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -342,17 +691,41 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\x03job\x18\x02 \x01(\v2\x04.JobR\x03job\"J\n" +
 	"\x12AssignTaskResponse\x12\x1a\n" +
 	"\baccepted\x18\x01 \x01(\bR\baccepted\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage*A\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\")\n" +
+	"\x10JobStatusRequest\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"g\n" +
+	"\x11JobStatusResponse\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12#\n" +
+	"\x06status\x18\x02 \x01(\x0e2\v.TaskStatusR\x06status\x12\x16\n" +
+	"\x06result\x18\x03 \x01(\tR\x06result\"H\n" +
+	"\x0eScriptChecksum\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x1a\n" +
+	"\bchecksum\x18\x02 \x01(\tR\bchecksum\"=\n" +
+	"\x10ChecksumResponse\x12)\n" +
+	"\ascripts\x18\x01 \x03(\v2\x0f.ScriptChecksumR\ascripts\"C\n" +
+	"\vFileContent\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\fR\acontent\"@\n" +
+	"\n" +
+	"SyncStatus\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"1\n" +
+	"\x13DeleteScriptRequest\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename*A\n" +
 	"\n" +
 	"TaskStatus\x12\v\n" +
 	"\aPENDING\x10\x00\x12\v\n" +
 	"\aRUNNING\x10\x01\x12\r\n" +
 	"\tCOMPLETED\x10\x02\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x032I\n" +
-	"\x10AgentTaskService\x125\n" +
+	"\x06FAILED\x10\x032\xa5\x02\n" +
+	"\fAgentService\x125\n" +
 	"\n" +
-	"AssignTask\x12\x12.AssignTaskRequest\x1a\x13.AssignTaskResponseB\bZ\x06proto/b\x06proto3"
+	"AssignTask\x12\x12.AssignTaskRequest\x1a\x13.AssignTaskResponse\x129\n" +
+	"\x10ReportTaskStatus\x12\x11.JobStatusRequest\x1a\x12.JobStatusResponse\x12?\n" +
+	"\x12GetScriptChecksums\x12\x16.google.protobuf.Empty\x1a\x11.ChecksumResponse\x12+\n" +
+	"\x0eSendScriptFile\x12\f.FileContent\x1a\v.SyncStatus\x125\n" +
+	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatusB\bZ\x06proto/b\x06proto3"
 
 var (
 	file_proto_agent_proto_rawDescOnce sync.Once
@@ -367,25 +740,43 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_agent_proto_goTypes = []any{
-	(TaskStatus)(0),            // 0: TaskStatus
-	(*Job)(nil),                // 1: Job
-	(*Task)(nil),               // 2: Task
-	(*AssignTaskRequest)(nil),  // 3: AssignTaskRequest
-	(*AssignTaskResponse)(nil), // 4: AssignTaskResponse
+	(TaskStatus)(0),             // 0: TaskStatus
+	(*Job)(nil),                 // 1: Job
+	(*Task)(nil),                // 2: Task
+	(*AssignTaskRequest)(nil),   // 3: AssignTaskRequest
+	(*AssignTaskResponse)(nil),  // 4: AssignTaskResponse
+	(*JobStatusRequest)(nil),    // 5: JobStatusRequest
+	(*JobStatusResponse)(nil),   // 6: JobStatusResponse
+	(*ScriptChecksum)(nil),      // 7: ScriptChecksum
+	(*ChecksumResponse)(nil),    // 8: ChecksumResponse
+	(*FileContent)(nil),         // 9: FileContent
+	(*SyncStatus)(nil),          // 10: SyncStatus
+	(*DeleteScriptRequest)(nil), // 11: DeleteScriptRequest
+	(*emptypb.Empty)(nil),       // 12: google.protobuf.Empty
 }
 var file_proto_agent_proto_depIdxs = []int32{
-	0, // 0: Task.status:type_name -> TaskStatus
-	2, // 1: AssignTaskRequest.task:type_name -> Task
-	1, // 2: AssignTaskRequest.job:type_name -> Job
-	3, // 3: AgentTaskService.AssignTask:input_type -> AssignTaskRequest
-	4, // 4: AgentTaskService.AssignTask:output_type -> AssignTaskResponse
-	4, // [4:5] is the sub-list for method output_type
-	3, // [3:4] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0,  // 0: Task.status:type_name -> TaskStatus
+	2,  // 1: AssignTaskRequest.task:type_name -> Task
+	1,  // 2: AssignTaskRequest.job:type_name -> Job
+	0,  // 3: JobStatusResponse.status:type_name -> TaskStatus
+	7,  // 4: ChecksumResponse.scripts:type_name -> ScriptChecksum
+	3,  // 5: AgentService.AssignTask:input_type -> AssignTaskRequest
+	5,  // 6: AgentService.ReportTaskStatus:input_type -> JobStatusRequest
+	12, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
+	9,  // 8: AgentService.SendScriptFile:input_type -> FileContent
+	11, // 9: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
+	4,  // 10: AgentService.AssignTask:output_type -> AssignTaskResponse
+	6,  // 11: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
+	8,  // 12: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
+	10, // 13: AgentService.SendScriptFile:output_type -> SyncStatus
+	10, // 14: AgentService.DeleteScriptFile:output_type -> SyncStatus
+	10, // [10:15] is the sub-list for method output_type
+	5,  // [5:10] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_proto_agent_proto_init() }
@@ -399,7 +790,7 @@ func file_proto_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_agent_proto_rawDesc), len(file_proto_agent_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

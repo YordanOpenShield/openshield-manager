@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "proto/";
 
+import "google/protobuf/empty.proto";
+
 message Job {
   string id = 1;
   string name = 2;
@@ -34,7 +36,47 @@ message AssignTaskResponse {
   string message = 2;
 }
 
+message JobStatusRequest {
+  string job_id = 1;
+}
+
+message JobStatusResponse {
+  string job_id = 1;
+  TaskStatus status = 2;
+  string result = 3;
+}
+
+message ScriptChecksum {
+  string filename = 1;
+  string checksum = 2;
+}
+
+message ChecksumResponse {
+  repeated ScriptChecksum scripts = 1;
+}
+
+message FileContent {
+  string filename = 1;
+  bytes content = 2;
+}
+
+message SyncStatus {
+  bool success = 1;
+  string message = 2;
+}
+
+message DeleteScriptRequest {
+  string filename = 1;
+}
+
 // Service for agent communication
-service AgentTaskService {
+service AgentService {
+  // Tasks
   rpc AssignTask (AssignTaskRequest) returns (AssignTaskResponse);
+  rpc ReportTaskStatus (JobStatusRequest) returns (JobStatusResponse);
+  
+  // Scripts
+  rpc GetScriptChecksums(google.protobuf.Empty) returns (ChecksumResponse);
+  rpc SendScriptFile(FileContent) returns (SyncStatus);
+  rpc DeleteScriptFile(DeleteScriptRequest) returns (SyncStatus);
 }

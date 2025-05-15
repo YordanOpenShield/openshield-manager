@@ -10,33 +10,21 @@ import (
 // AgentClient wraps the gRPC client and connection.
 type AgentClient struct {
 	conn   *grpc.ClientConn
-	client proto.AgentTaskServiceClient
+	client proto.AgentServiceClient
 }
 
 // NewAgentClient initializes and returns a new AgentClient.
-func NewAgentClient(agentAddress string /*, timeout time.Duration*/) (*AgentClient, error) {
-	// ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	// defer cancel()
-
-	// Set default agentAddress if empty
-	if agentAddress == "" {
-		agentAddress = "localhost:50051"
-	}
-	// Set default timeout if zero
-	// if timeout == 0 {
-	// 	timeout = 60 * time.Second
-	// }
+func NewAgentClient(agentAddress string) (*AgentClient, error) {
 
 	conn, err := grpc.NewClient(
-		agentAddress,
-		// ctx,
+		agentAddress+":50051",
 		grpc.WithTransportCredentials(insecure.NewCredentials()), // Use TLS in production
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	client := proto.NewAgentTaskServiceClient(conn)
+	client := proto.NewAgentServiceClient(conn)
 
 	return &AgentClient{
 		conn:   conn,
