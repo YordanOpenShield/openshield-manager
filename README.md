@@ -26,7 +26,7 @@ OpenShield Manager is a Go-based backend for managing agents, jobs, and scripts 
 
 2. **Generate gRPC code:**
    ```cmd
-   protoc --go_out=./proto --go-grpc_out=./proto proto/rpc.proto
+   protoc --go_out=. --go-grpc_out=. proto/rpc.proto
    ```
 
 3. **Start services with Docker Compose:**
