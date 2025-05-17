@@ -819,14 +819,15 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\aRUNNING\x10\x01\x12\r\n" +
 	"\tCOMPLETED\x10\x02\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x032\xa5\x02\n" +
+	"\x06FAILED\x10\x032\xe8\x02\n" +
 	"\fAgentService\x125\n" +
 	"\n" +
 	"AssignTask\x12\x12.AssignTaskRequest\x1a\x13.AssignTaskResponse\x129\n" +
 	"\x10ReportTaskStatus\x12\x11.JobStatusRequest\x1a\x12.JobStatusResponse\x12?\n" +
 	"\x12GetScriptChecksums\x12\x16.google.protobuf.Empty\x1a\x11.ChecksumResponse\x12+\n" +
 	"\x0eSendScriptFile\x12\f.FileContent\x1a\v.SyncStatus\x125\n" +
-	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatus2D\n" +
+	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatus\x12A\n" +
+	"\x0fTryAgentAddress\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2D\n" +
 	"\x0eManagerService\x122\n" +
 	"\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponseB\bZ\x06proto/b\x06proto3"
 
@@ -872,15 +873,17 @@ var file_proto_rpc_proto_depIdxs = []int32{
 	14, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
 	9,  // 8: AgentService.SendScriptFile:input_type -> FileContent
 	11, // 9: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
-	12, // 10: ManagerService.Heartbeat:input_type -> HeartbeatRequest
-	4,  // 11: AgentService.AssignTask:output_type -> AssignTaskResponse
-	6,  // 12: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
-	8,  // 13: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
-	10, // 14: AgentService.SendScriptFile:output_type -> SyncStatus
-	10, // 15: AgentService.DeleteScriptFile:output_type -> SyncStatus
-	13, // 16: ManagerService.Heartbeat:output_type -> HeartbeatResponse
-	11, // [11:17] is the sub-list for method output_type
-	5,  // [5:11] is the sub-list for method input_type
+	14, // 10: AgentService.TryAgentAddress:input_type -> google.protobuf.Empty
+	12, // 11: ManagerService.Heartbeat:input_type -> HeartbeatRequest
+	4,  // 12: AgentService.AssignTask:output_type -> AssignTaskResponse
+	6,  // 13: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
+	8,  // 14: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
+	10, // 15: AgentService.SendScriptFile:output_type -> SyncStatus
+	10, // 16: AgentService.DeleteScriptFile:output_type -> SyncStatus
+	14, // 17: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
+	13, // 18: ManagerService.Heartbeat:output_type -> HeartbeatResponse
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name

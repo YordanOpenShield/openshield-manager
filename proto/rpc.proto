@@ -87,6 +87,9 @@ service AgentService {
   rpc GetScriptChecksums(google.protobuf.Empty) returns (ChecksumResponse);
   rpc SendScriptFile(FileContent) returns (SyncStatus);
   rpc DeleteScriptFile(DeleteScriptRequest) returns (SyncStatus);
+
+  // Agents
+  rpc TryAgentAddress(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 // Service for manager communication
