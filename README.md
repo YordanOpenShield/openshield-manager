@@ -57,14 +57,6 @@ OpenShield Manager is a Go-based backend for managing agents, jobs, and scripts 
 - `GET /api/jobs/available` — List available jobs
 - `POST /api/jobs/create` — Create a new job
 
-## gRPC
-
-- Service definitions are in `proto/rpc.proto`.
-- To regenerate Go code after editing proto files:
-  ```cmd
-  protoc --go_out=./proto --go-grpc_out=./proto proto/rpc.proto
-  ```
-
 ## License
 
 MIT License
