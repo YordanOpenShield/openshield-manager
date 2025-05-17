@@ -10,8 +10,55 @@ import (
 	"openshield-manager/proto"
 	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+func (s *ManagerServer) RegisterAgent(ctx context.Context, req *proto.RegisterAgentRequest) (*proto.RegisterAgentResponse, error) {
+	// Create a new agent
+	agentID := uuid.New()
+	agent := models.Agent{
+		ID:       agentID,
+		Token:    uuid.New().String(),
+		LastSeen: time.Now(),
+		DeviceID: req.DeviceId,
+		State:    "DISCONNECTED",
+	}
+
+	db.DB.Create(&agent)
+
+	return &proto.RegisterAgentResponse{
+		Id:    agentID.String(),
+		Token: agent.Token,
+	}, nil
+}
+
+func (s *ManagerServer) UnregisterAgent(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	// Extract agent ID from context (e.g., from metadata or authentication)
+	agentID, err := extractAgentIDFromContext(ctx)
+	if err != nil {
+		log.Printf("[UNREGISTER] Failed to extract agent ID: %v", err)
+		return nil, err
+	}
+
+	// Delete agent and its addresses
+	if err := db.DB.Where("agent_id = ?", agentID).Delete(&models.AgentAddress{}).Error; err != nil {
+		log.Printf("[UNREGISTER] Failed to delete agent addresses: %v", err)
+		return nil, err
+	}
+	if err := db.DB.Where("id = ?", agentID).Delete(&models.Agent{}).Error; err != nil {
+		log.Printf("[UNREGISTER] Failed to delete agent: %v", err)
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
+// Helper function to extract agent ID from context (stub, replace with real implementation)
+func extractAgentIDFromContext(ctx context.Context) (string, error) {
+	// TODO: Extract agent ID from context metadata or authentication
+	return "", fmt.Errorf("not implemented")
+}
 
 // TryAgentAddresses attempts to connect to the agent using all its addresses.
 // On a successful connection, updates the agent's address in the database.

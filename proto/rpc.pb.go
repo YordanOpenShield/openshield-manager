@@ -766,6 +766,50 @@ func (x *HeartbeatResponse) GetOk() bool {
 	return false
 }
 
+type RegisterAgentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RegisterAgentRequest) Reset() {
+	*x = RegisterAgentRequest{}
+	mi := &file_proto_rpc_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterAgentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterAgentRequest) ProtoMessage() {}
+
+func (x *RegisterAgentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterAgentRequest.ProtoReflect.Descriptor instead.
+func (*RegisterAgentRequest) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *RegisterAgentRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
 type RegisterAgentResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -776,7 +820,7 @@ type RegisterAgentResponse struct {
 
 func (x *RegisterAgentResponse) Reset() {
 	*x = RegisterAgentResponse{}
-	mi := &file_proto_rpc_proto_msgTypes[13]
+	mi := &file_proto_rpc_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -788,7 +832,7 @@ func (x *RegisterAgentResponse) String() string {
 func (*RegisterAgentResponse) ProtoMessage() {}
 
 func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_rpc_proto_msgTypes[13]
+	mi := &file_proto_rpc_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -801,7 +845,7 @@ func (x *RegisterAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterAgentResponse.ProtoReflect.Descriptor instead.
 func (*RegisterAgentResponse) Descriptor() ([]byte, []int) {
-	return file_proto_rpc_proto_rawDescGZIP(), []int{13}
+	return file_proto_rpc_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RegisterAgentResponse) GetId() string {
@@ -864,7 +908,9 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"#\n" +
 	"\x11HeartbeatResponse\x12\x0e\n" +
-	"\x02ok\x18\x01 \x01(\bR\x02ok\"=\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"3\n" +
+	"\x14RegisterAgentRequest\x12\x1b\n" +
+	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\"=\n" +
 	"\x15RegisterAgentResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token*A\n" +
@@ -882,9 +928,9 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\x12GetScriptChecksums\x12\x16.google.protobuf.Empty\x1a\x11.ChecksumResponse\x12+\n" +
 	"\x0eSendScriptFile\x12\f.FileContent\x1a\v.SyncStatus\x125\n" +
 	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatus\x12A\n" +
-	"\x0fTryAgentAddress\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2\xc8\x01\n" +
-	"\x0eManagerService\x12?\n" +
-	"\rRegisterAgent\x12\x16.google.protobuf.Empty\x1a\x16.RegisterAgentResponse\x12A\n" +
+	"\x0fTryAgentAddress\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2\xc7\x01\n" +
+	"\x0eManagerService\x12>\n" +
+	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\x12A\n" +
 	"\x0fUnregisterAgent\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x122\n" +
 	"\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponseB\bZ\x06proto/b\x06proto3"
 
@@ -901,7 +947,7 @@ func file_proto_rpc_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_rpc_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_proto_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_proto_rpc_proto_goTypes = []any{
 	(TaskStatus)(0),               // 0: TaskStatus
 	(*Job)(nil),                   // 1: Job
@@ -917,8 +963,9 @@ var file_proto_rpc_proto_goTypes = []any{
 	(*DeleteScriptRequest)(nil),   // 11: DeleteScriptRequest
 	(*HeartbeatRequest)(nil),      // 12: HeartbeatRequest
 	(*HeartbeatResponse)(nil),     // 13: HeartbeatResponse
-	(*RegisterAgentResponse)(nil), // 14: RegisterAgentResponse
-	(*emptypb.Empty)(nil),         // 15: google.protobuf.Empty
+	(*RegisterAgentRequest)(nil),  // 14: RegisterAgentRequest
+	(*RegisterAgentResponse)(nil), // 15: RegisterAgentResponse
+	(*emptypb.Empty)(nil),         // 16: google.protobuf.Empty
 }
 var file_proto_rpc_proto_depIdxs = []int32{
 	0,  // 0: Task.status:type_name -> TaskStatus
@@ -928,21 +975,21 @@ var file_proto_rpc_proto_depIdxs = []int32{
 	7,  // 4: ChecksumResponse.scripts:type_name -> ScriptChecksum
 	3,  // 5: AgentService.AssignTask:input_type -> AssignTaskRequest
 	5,  // 6: AgentService.ReportTaskStatus:input_type -> JobStatusRequest
-	15, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
+	16, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
 	9,  // 8: AgentService.SendScriptFile:input_type -> FileContent
 	11, // 9: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
-	15, // 10: AgentService.TryAgentAddress:input_type -> google.protobuf.Empty
-	15, // 11: ManagerService.RegisterAgent:input_type -> google.protobuf.Empty
-	15, // 12: ManagerService.UnregisterAgent:input_type -> google.protobuf.Empty
+	16, // 10: AgentService.TryAgentAddress:input_type -> google.protobuf.Empty
+	14, // 11: ManagerService.RegisterAgent:input_type -> RegisterAgentRequest
+	16, // 12: ManagerService.UnregisterAgent:input_type -> google.protobuf.Empty
 	12, // 13: ManagerService.Heartbeat:input_type -> HeartbeatRequest
 	4,  // 14: AgentService.AssignTask:output_type -> AssignTaskResponse
 	6,  // 15: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
 	8,  // 16: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
 	10, // 17: AgentService.SendScriptFile:output_type -> SyncStatus
 	10, // 18: AgentService.DeleteScriptFile:output_type -> SyncStatus
-	15, // 19: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
-	14, // 20: ManagerService.RegisterAgent:output_type -> RegisterAgentResponse
-	15, // 21: ManagerService.UnregisterAgent:output_type -> google.protobuf.Empty
+	16, // 19: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
+	15, // 20: ManagerService.RegisterAgent:output_type -> RegisterAgentResponse
+	16, // 21: ManagerService.UnregisterAgent:output_type -> google.protobuf.Empty
 	13, // 22: ManagerService.Heartbeat:output_type -> HeartbeatResponse
 	14, // [14:23] is the sub-list for method output_type
 	5,  // [5:14] is the sub-list for method input_type
@@ -962,7 +1009,7 @@ func file_proto_rpc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_rpc_proto_rawDesc), len(file_proto_rpc_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

@@ -77,6 +77,10 @@ message HeartbeatResponse {
   bool ok = 1;
 }
 
+message RegisterAgentRequest {
+  string device_id = 1;
+}
+
 message RegisterAgentResponse {
   string id = 1;
   string token = 2;
@@ -99,7 +103,7 @@ service AgentService {
 
 // Service for manager communication
 service ManagerService {
-  rpc RegisterAgent(google.protobuf.Empty) returns (RegisterAgentResponse);
+  rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
   rpc UnregisterAgent(google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
 }

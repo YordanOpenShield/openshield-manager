@@ -333,7 +333,7 @@ const (
 //
 // Service for manager communication
 type ManagerServiceClient interface {
-	RegisterAgent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
+	RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
 	UnregisterAgent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 }
@@ -346,7 +346,7 @@ func NewManagerServiceClient(cc grpc.ClientConnInterface) ManagerServiceClient {
 	return &managerServiceClient{cc}
 }
 
-func (c *managerServiceClient) RegisterAgent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RegisterAgentResponse, error) {
+func (c *managerServiceClient) RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RegisterAgentResponse)
 	err := c.cc.Invoke(ctx, ManagerService_RegisterAgent_FullMethodName, in, out, cOpts...)
@@ -382,7 +382,7 @@ func (c *managerServiceClient) Heartbeat(ctx context.Context, in *HeartbeatReque
 //
 // Service for manager communication
 type ManagerServiceServer interface {
-	RegisterAgent(context.Context, *emptypb.Empty) (*RegisterAgentResponse, error)
+	RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error)
 	UnregisterAgent(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	mustEmbedUnimplementedManagerServiceServer()
@@ -395,7 +395,7 @@ type ManagerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedManagerServiceServer struct{}
 
-func (UnimplementedManagerServiceServer) RegisterAgent(context.Context, *emptypb.Empty) (*RegisterAgentResponse, error) {
+func (UnimplementedManagerServiceServer) RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterAgent not implemented")
 }
 func (UnimplementedManagerServiceServer) UnregisterAgent(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
@@ -426,7 +426,7 @@ func RegisterManagerServiceServer(s grpc.ServiceRegistrar, srv ManagerServiceSer
 }
 
 func _ManagerService_RegisterAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(RegisterAgentRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -438,7 +438,7 @@ func _ManagerService_RegisterAgent_Handler(srv interface{}, ctx context.Context,
 		FullMethod: ManagerService_RegisterAgent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServiceServer).RegisterAgent(ctx, req.(*emptypb.Empty))
+		return srv.(ManagerServiceServer).RegisterAgent(ctx, req.(*RegisterAgentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
