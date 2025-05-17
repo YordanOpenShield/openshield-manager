@@ -36,19 +36,13 @@ func main() {
 
 	// Initialize the router
 	router := gin.Default()
-
-	// Agents routes
-	agentGroup := router.Group("/agents")
-	{
-		agentGroup.POST("/register", api.RegisterAgent)
-		agentGroup.POST("/unregister", api.UnregisterAgent, api.AgentAuthMiddleware())
-		agentGroup.POST("/heartbeat", api.AgentHeartbeat, api.AgentAuthMiddleware())
-	}
 	// External API routes
 	apiGroup := router.Group("/api")
 	{
 		agents := apiGroup.Group("/agents")
 		{
+			agents.POST("/register", api.RegisterAgent)
+			agents.POST("/unregister", api.UnregisterAgent)
 			agents.GET("/list", api.GetAgentsList)
 			agents.GET("/:id", api.GetAgentDetails)
 			agents.GET("/:id/tasks", api.GetTasksByAgent)

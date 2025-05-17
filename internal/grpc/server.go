@@ -21,7 +21,9 @@ func StartGRPCServer(port int) error {
 	}
 
 	// Register the gRPC server
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(AgentTokenInterceptor()),
+	)
 	proto.RegisterManagerServiceServer(grpcServer, &ManagerServer{})
 
 	log.Printf("[MANAGER] gRPC server listening on port %d", port)
