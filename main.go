@@ -5,6 +5,7 @@ import (
 	"openshield-manager/internal/api"
 	"openshield-manager/internal/config"
 	"openshield-manager/internal/db"
+	managergrpc "openshield-manager/internal/grpc"
 	"openshield-manager/internal/service"
 	"time"
 
@@ -23,11 +24,15 @@ func main() {
 	// Initialize the database connection
 	db.ConnectDatabase()
 
+	// Initialize the gRPC server
+	err = managergrpc.StartGRPCServer(50052)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC server: %v", err)
+	}
+
 	// Start background tasks
 	stopScriptsSync := make(chan struct{})
-	service.StartGlobalScriptSyncMonitor(30*time.Second, stopScriptsSync)
-	stopHeartbeat := make(chan struct{})
-	service.StartAgentHeartbeatMonitor(30*time.Second, stopHeartbeat)
+	service.ScriptSyncMonitor(30*time.Second, stopScriptsSync)
 
 	// Initialize the router
 	router := gin.Default()

@@ -1,4 +1,4 @@
-package grpcclient
+package managergrpc
 
 import (
 	"crypto/sha256"
@@ -97,23 +97,3 @@ func SyncScripts(agentAddress string) error {
 	log.Println("[SCRIPT SYNC] Script sync completed.")
 	return nil
 }
-
-// MonitorScriptsChecksums runs as a goroutine and periodically calls SyncScripts in the background.
-// func MonitorScriptsChecksums(agentAddress string, stopCh <-chan struct{}) {
-// 	go func() {
-// 		ticker := time.NewTicker(10 * time.Second)
-// 		defer ticker.Stop()
-
-// 		for {
-// 			select {
-// 			case <-ticker.C:
-// 				if err := SyncScripts(agentAddress); err != nil {
-// 					log.Printf("[SCRIPT SYNC] Error syncing scripts: %v", err)
-// 				}
-// 			case <-stopCh:
-// 				log.Println("[SCRIPT SYNC] Stopped script monitor.")
-// 				return
-// 			}
-// 		}
-// 	}()
-// }

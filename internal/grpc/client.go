@@ -1,7 +1,6 @@
-package grpcclient
+package managergrpc
 
 import (
-	"context"
 	"openshield-manager/proto"
 
 	"google.golang.org/grpc"
@@ -36,14 +35,4 @@ func NewAgentClient(agentAddress string) (*AgentClient, error) {
 // Close terminates the connection to the agent.
 func (a *AgentClient) Close() {
 	a.conn.Close()
-}
-
-// Heartbeat sends a heartbeat signal to the agent and checks if it's alive.
-func (c *AgentClient) Heartbeat(ctx context.Context, agentID string) (bool, error) {
-	req := &proto.HeartbeatRequest{AgentId: agentID}
-	resp, err := c.client.Heartbeat(ctx, req)
-	if err != nil {
-		return false, err
-	}
-	return resp.Ok, nil
 }

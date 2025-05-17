@@ -71,10 +71,10 @@ message DeleteScriptRequest {
 
 message HeartbeatRequest {
   string agent_id = 1;
+  string message = 2;
 }
 message HeartbeatResponse {
   bool ok = 1;
-  string message = 2;
 }
 
 // Service for agent communication
@@ -87,7 +87,9 @@ service AgentService {
   rpc GetScriptChecksums(google.protobuf.Empty) returns (ChecksumResponse);
   rpc SendScriptFile(FileContent) returns (SyncStatus);
   rpc DeleteScriptFile(DeleteScriptRequest) returns (SyncStatus);
+}
 
-  // Agents
+// Service for manager communication
+service ManagerService {
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
 }

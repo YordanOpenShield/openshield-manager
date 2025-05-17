@@ -31,7 +31,7 @@ func ConnectDatabase() {
 		if err != nil {
 			log.Fatalf("failed to connect to PostgreSQL: %v", err)
 		}
-		log.Println("Connected to PostgreSQL (production)")
+		log.Println("[MANAGER] Connected to PostgreSQL (production)")
 
 	default:
 		dsn := fmt.Sprintf(
@@ -46,7 +46,7 @@ func ConnectDatabase() {
 		if err != nil {
 			log.Fatalf("failed to connect to PostgreSQL: %v", err)
 		}
-		log.Println("Connected to PostgreSQL (development)")
+		log.Println("[MANAGER] Connected to PostgreSQL (development)")
 	}
 
 	err = DB.AutoMigrate(&models.Agent{}, &models.AgentAddress{}, &models.Job{}, &models.Task{})
