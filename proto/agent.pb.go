@@ -670,6 +670,102 @@ func (x *DeleteScriptRequest) GetFilename() string {
 	return ""
 }
 
+type HeartbeatRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeartbeatRequest) Reset() {
+	*x = HeartbeatRequest{}
+	mi := &file_proto_agent_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeartbeatRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeartbeatRequest) ProtoMessage() {}
+
+func (x *HeartbeatRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeartbeatRequest.ProtoReflect.Descriptor instead.
+func (*HeartbeatRequest) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *HeartbeatRequest) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
+	}
+	return ""
+}
+
+type HeartbeatResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HeartbeatResponse) Reset() {
+	*x = HeartbeatResponse{}
+	mi := &file_proto_agent_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeartbeatResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeartbeatResponse) ProtoMessage() {}
+
+func (x *HeartbeatResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_agent_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeartbeatResponse.ProtoReflect.Descriptor instead.
+func (*HeartbeatResponse) Descriptor() ([]byte, []int) {
+	return file_proto_agent_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *HeartbeatResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *HeartbeatResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_proto_agent_proto protoreflect.FileDescriptor
 
 const file_proto_agent_proto_rawDesc = "" +
@@ -711,21 +807,27 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"1\n" +
 	"\x13DeleteScriptRequest\x12\x1a\n" +
-	"\bfilename\x18\x01 \x01(\tR\bfilename*A\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\"-\n" +
+	"\x10HeartbeatRequest\x12\x19\n" +
+	"\bagent_id\x18\x01 \x01(\tR\aagentId\"=\n" +
+	"\x11HeartbeatResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage*A\n" +
 	"\n" +
 	"TaskStatus\x12\v\n" +
 	"\aPENDING\x10\x00\x12\v\n" +
 	"\aRUNNING\x10\x01\x12\r\n" +
 	"\tCOMPLETED\x10\x02\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x032\xa5\x02\n" +
+	"\x06FAILED\x10\x032\xd9\x02\n" +
 	"\fAgentService\x125\n" +
 	"\n" +
 	"AssignTask\x12\x12.AssignTaskRequest\x1a\x13.AssignTaskResponse\x129\n" +
 	"\x10ReportTaskStatus\x12\x11.JobStatusRequest\x1a\x12.JobStatusResponse\x12?\n" +
 	"\x12GetScriptChecksums\x12\x16.google.protobuf.Empty\x1a\x11.ChecksumResponse\x12+\n" +
 	"\x0eSendScriptFile\x12\f.FileContent\x1a\v.SyncStatus\x125\n" +
-	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatusB\bZ\x06proto/b\x06proto3"
+	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatus\x122\n" +
+	"\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponseB\bZ\x06proto/b\x06proto3"
 
 var (
 	file_proto_agent_proto_rawDescOnce sync.Once
@@ -740,7 +842,7 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_proto_agent_proto_goTypes = []any{
 	(TaskStatus)(0),             // 0: TaskStatus
 	(*Job)(nil),                 // 1: Job
@@ -754,7 +856,9 @@ var file_proto_agent_proto_goTypes = []any{
 	(*FileContent)(nil),         // 9: FileContent
 	(*SyncStatus)(nil),          // 10: SyncStatus
 	(*DeleteScriptRequest)(nil), // 11: DeleteScriptRequest
-	(*emptypb.Empty)(nil),       // 12: google.protobuf.Empty
+	(*HeartbeatRequest)(nil),    // 12: HeartbeatRequest
+	(*HeartbeatResponse)(nil),   // 13: HeartbeatResponse
+	(*emptypb.Empty)(nil),       // 14: google.protobuf.Empty
 }
 var file_proto_agent_proto_depIdxs = []int32{
 	0,  // 0: Task.status:type_name -> TaskStatus
@@ -764,16 +868,18 @@ var file_proto_agent_proto_depIdxs = []int32{
 	7,  // 4: ChecksumResponse.scripts:type_name -> ScriptChecksum
 	3,  // 5: AgentService.AssignTask:input_type -> AssignTaskRequest
 	5,  // 6: AgentService.ReportTaskStatus:input_type -> JobStatusRequest
-	12, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
+	14, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
 	9,  // 8: AgentService.SendScriptFile:input_type -> FileContent
 	11, // 9: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
-	4,  // 10: AgentService.AssignTask:output_type -> AssignTaskResponse
-	6,  // 11: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
-	8,  // 12: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
-	10, // 13: AgentService.SendScriptFile:output_type -> SyncStatus
-	10, // 14: AgentService.DeleteScriptFile:output_type -> SyncStatus
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
+	12, // 10: AgentService.Heartbeat:input_type -> HeartbeatRequest
+	4,  // 11: AgentService.AssignTask:output_type -> AssignTaskResponse
+	6,  // 12: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
+	8,  // 13: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
+	10, // 14: AgentService.SendScriptFile:output_type -> SyncStatus
+	10, // 15: AgentService.DeleteScriptFile:output_type -> SyncStatus
+	13, // 16: AgentService.Heartbeat:output_type -> HeartbeatResponse
+	11, // [11:17] is the sub-list for method output_type
+	5,  // [5:11] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -790,7 +896,7 @@ func file_proto_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_agent_proto_rawDesc), len(file_proto_agent_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

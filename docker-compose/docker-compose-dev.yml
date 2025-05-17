@@ -1,16 +1,17 @@
 version: '3'
 services:
-  manager:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      DB_URL: postgres://user:pass@db:5432/openshield?sslmode=disable
-    depends_on:
-      - db
   db:
-    image: postgres
+    image: postgres:latest
+    container_name: openshield-db
+    ports:
+      - "5432:5432"
     environment:
-      POSTGRES_DB: openshield
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      - POSTGRES_DB=openshield
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - openshield-db-data:/var/lib/postgresql/data
+
+volumes:
+  openshield-db-data:
+    driver: local

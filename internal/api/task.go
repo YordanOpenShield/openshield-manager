@@ -77,3 +77,33 @@ func AssignTaskToAgent(c *gin.Context) {
 	go grpcclient.TrackTaskStatus(agent.Address, task.ID.String(), job.ID.String(), 1*time.Second)
 
 }
+
+// GetTasksByAgent returns all tasks for a given agent ID
+func GetTasksByAgent(c *gin.Context) {
+	agentID := c.Param("id")
+
+	// Check if the agent exists
+	var agent models.Agent
+	if err := db.DB.Where("id = ?", agentID).First(&agent).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
+		return
+	}
+
+	// Fetch tasks for the agent
+	var tasks []models.Task
+	if err := db.DB.Where("agent_id = ?", agentID).Find(&tasks).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch tasks for agent: " + err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, tasks)
+}
+
+// GetAllTasks returns all tasks in the system
+func GetAllTasks(c *gin.Context) {
+	var tasks []models.Task
+	if err := db.DB.Find(&tasks).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch tasks: " + err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, tasks)
+}

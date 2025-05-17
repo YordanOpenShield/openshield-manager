@@ -70,8 +70,8 @@ func UnregisterAgent(c *gin.Context) {
 }
 
 type HeartbeatRequest struct {
-	ID      string `json:"id" binding:"required"`
-	Address string `json:"address" binding:"required"`
+	ID        string   `json:"id" binding:"required"`
+	Addresses []string `json:"addresses" binding:"required"`
 }
 
 func AgentHeartbeat(c *gin.Context) {
@@ -90,11 +90,31 @@ func AgentHeartbeat(c *gin.Context) {
 		return
 	}
 
-	// Update the agent’s last heartbeat timestamp
+	// Update the agent’s last heartbeat timestamp and state
 	agent.LastSeen = time.Now()
-	agent.Address = req.Address
 	agent.State = "CONNECTED"
-	db.DB.Save(&agent)
+	if err := db.DB.Save(&agent).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update agent"})
+		return
+	}
+
+	// Remove old addresses for this agent
+	if err := db.DB.Where("agent_id = ?", agent.ID).Delete(&models.AgentAddress{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear old addresses"})
+		return
+	}
+
+	// Insert new addresses
+	for _, addr := range req.Addresses {
+		address := models.AgentAddress{
+			AgentID: agent.ID,
+			Address: addr,
+		}
+		if err := db.DB.Create(&address).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save address"})
+			return
+		}
+	}
 
 	// Respond with a success message
 	c.Status(http.StatusOK)

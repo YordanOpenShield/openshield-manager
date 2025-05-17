@@ -10,10 +10,20 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetAvailableJobs(c *gin.Context) {
+func GetJobs(c *gin.Context) {
 	var jobs []models.Job
 	db.DB.Find(&jobs)
 	c.JSON(http.StatusOK, jobs)
+}
+
+func GetJobDetails(c *gin.Context) {
+	id := c.Param("id")
+	var job models.Job
+	if err := db.DB.Where("id = ?", id).First(&job).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
+		return
+	}
+	c.JSON(http.StatusOK, job)
 }
 
 type CreateJobRequest struct {

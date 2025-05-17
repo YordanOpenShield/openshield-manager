@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"openshield-manager/internal/api"
+	"openshield-manager/internal/config"
 	"openshield-manager/internal/db"
 	"openshield-manager/internal/service"
 	"time"
@@ -9,36 +11,55 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const configFile = "config/config.yml"
+
 func main() {
+	// Load the configuration file
+	err := config.LoadAndSetConfig(configFile)
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
 	// Initialize the database connection
 	db.ConnectDatabase()
 
 	// Start background tasks
-	stopCh := make(chan struct{})
-	service.StartGlobalScriptSyncMonitor(30*time.Second, stopCh)
+	stopScriptsSync := make(chan struct{})
+	service.StartGlobalScriptSyncMonitor(30*time.Second, stopScriptsSync)
+	stopHeartbeat := make(chan struct{})
+	service.StartAgentHeartbeatMonitor(30*time.Second, stopHeartbeat)
 
 	// Initialize the router
 	router := gin.Default()
+
+	// Agents routes
+	agentGroup := router.Group("/agents")
+	{
+		agentGroup.POST("/register", api.RegisterAgent)
+		agentGroup.POST("/unregister", api.UnregisterAgent, api.AgentAuthMiddleware())
+		agentGroup.POST("/heartbeat", api.AgentHeartbeat, api.AgentAuthMiddleware())
+	}
+	// External API routes
 	apiGroup := router.Group("/api")
 	{
-		// Register endpoint (no auth)
-		apiGroup.POST("/agents/register", api.RegisterAgent)
-		// Authenticated agents endpoints
-		agent := apiGroup.Group("/agents", api.AgentAuthMiddleware())
+		agents := apiGroup.Group("/agents")
 		{
-			agent.POST("/unregister", api.UnregisterAgent)
-			agent.POST("/heartbeat", api.AgentHeartbeat)
+			agents.GET("/list", api.GetAgentsList)
+			agents.GET("/:id", api.GetAgentDetails)
+			agents.GET("/:id/tasks", api.GetTasksByAgent)
 		}
 		// Jobs endpoints
 		jobs := apiGroup.Group("/jobs")
 		{
-			jobs.GET("/available", api.GetAvailableJobs)
+			jobs.GET("/list", api.GetJobs)
+			jobs.GET("/:id", api.GetJobDetails)
 			jobs.POST("/create", api.CreateJob)
 		}
 		// Tasks endpoints
 		tasks := apiGroup.Group("/tasks")
 		{
 			tasks.POST("/assign", api.AssignTaskToAgent)
+			tasks.GET("/list", api.GetAllTasks)
 		}
 	}
 

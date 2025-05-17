@@ -15,10 +15,15 @@ const (
 )
 
 type Agent struct {
-	ID       uuid.UUID `gorm:"type:uuid;primaryKey"`
-	DeviceID string    `gorm:"uniqueIndex"`
-	Token    string
-	LastSeen time.Time
-	Address  string
-	State    AgentState `gorm:"default:'Unregistered'"`
+	ID       uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
+	DeviceID string     `gorm:"uniqueIndex" json:"device_id"`
+	Token    string     `json:"token"`
+	LastSeen time.Time  `json:"last_seen"`
+	Address  string     `json:"address"`
+	State    AgentState `gorm:"default:'Unregistered'" json:"state"`
+}
+
+type AgentAddress struct {
+	AgentID uuid.UUID `gorm:"type:uuid" json:"agent_id"`
+	Address string    `json:"ip"`
 }

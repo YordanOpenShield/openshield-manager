@@ -1,0 +1,7 @@
+ENVIRONMENT: development
+DB_HOST: localhost
+DB_PORT: 5432
+DB_USER: user
+DB_PASSWORD: pass
+DB_NAME: openshield
+DB_SSLMODE: disable
