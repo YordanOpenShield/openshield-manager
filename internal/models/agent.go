@@ -11,7 +11,6 @@ type AgentState string
 const (
 	AgentStateDisconnected AgentState = "DISCONNECTED" // Agent is registered but not connected
 	AgentStateConnected    AgentState = "CONNECTED"    // Agent is registered and connected
-	AgentStateUnregistered AgentState = "UNREGISTERED" // Agent is not registered
 )
 
 type Agent struct {
@@ -20,7 +19,7 @@ type Agent struct {
 	Token    string     `json:"token"`
 	LastSeen time.Time  `json:"last_seen"`
 	Address  string     `json:"address"`
-	State    AgentState `gorm:"default:'Unregistered'" json:"state"`
+	State    AgentState `gorm:"default:'DISCONNECTED'" json:"state"`
 }
 
 type AgentAddress struct {

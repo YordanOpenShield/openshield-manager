@@ -1,47 +1,16 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"openshield-manager/internal/db"
+	managergrpc "openshield-manager/internal/grpc"
 	"openshield-manager/internal/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
-
-type RegisterRequest struct {
-	DeviceID string `json:"device_id" binding:"required"`
-}
-
-func RegisterAgent(c *gin.Context) {
-	var req RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
-		return
-	}
-
-	// Check if an agent with this DeviceID already exists
-	var existing models.Agent
-	if err := db.DB.Where("device_id = ?", req.DeviceID).First(&existing).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Agent already registered on this device"})
-		return
-	}
-	// Create a new agent
-	agentID := uuid.New()
-	agent := models.Agent{
-		ID:       agentID,
-		Token:    uuid.New().String(),
-		LastSeen: time.Now(),
-		DeviceID: req.DeviceID,
-		State:    "DISCONNECTED",
-	}
-
-	db.DB.Create(&agent)
-
-	c.JSON(http.StatusOK, gin.H{"id": agent.ID, "token": agent.Token})
-}
 
 type UnregisterRequest struct {
 	ID string `json:"id" binding:"required"`
@@ -60,9 +29,16 @@ func UnregisterAgent(c *gin.Context) {
 		return
 	}
 
-	agent.State = "UNREGISTERED"
-	if err := db.DB.Save(&agent).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister agent"})
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+	client, err := managergrpc.NewAgentClient(agent.Address)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create gRPC client: " + err.Error()})
+		return
+	}
+	err = client.UnregisterAgentAsk(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unregister agent: " + err.Error()})
 		return
 	}
 

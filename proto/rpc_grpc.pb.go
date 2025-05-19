@@ -25,6 +25,7 @@ const (
 	AgentService_GetScriptChecksums_FullMethodName = "/AgentService/GetScriptChecksums"
 	AgentService_SendScriptFile_FullMethodName     = "/AgentService/SendScriptFile"
 	AgentService_DeleteScriptFile_FullMethodName   = "/AgentService/DeleteScriptFile"
+	AgentService_UnregisterAgentAsk_FullMethodName = "/AgentService/UnregisterAgentAsk"
 	AgentService_TryAgentAddress_FullMethodName    = "/AgentService/TryAgentAddress"
 )
 
@@ -42,6 +43,7 @@ type AgentServiceClient interface {
 	SendScriptFile(ctx context.Context, in *FileContent, opts ...grpc.CallOption) (*SyncStatus, error)
 	DeleteScriptFile(ctx context.Context, in *DeleteScriptRequest, opts ...grpc.CallOption) (*SyncStatus, error)
 	// Agents
+	UnregisterAgentAsk(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	TryAgentAddress(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -103,6 +105,16 @@ func (c *agentServiceClient) DeleteScriptFile(ctx context.Context, in *DeleteScr
 	return out, nil
 }
 
+func (c *agentServiceClient) UnregisterAgentAsk(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AgentService_UnregisterAgentAsk_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *agentServiceClient) TryAgentAddress(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -127,6 +139,7 @@ type AgentServiceServer interface {
 	SendScriptFile(context.Context, *FileContent) (*SyncStatus, error)
 	DeleteScriptFile(context.Context, *DeleteScriptRequest) (*SyncStatus, error)
 	// Agents
+	UnregisterAgentAsk(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	TryAgentAddress(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
@@ -152,6 +165,9 @@ func (UnimplementedAgentServiceServer) SendScriptFile(context.Context, *FileCont
 }
 func (UnimplementedAgentServiceServer) DeleteScriptFile(context.Context, *DeleteScriptRequest) (*SyncStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteScriptFile not implemented")
+}
+func (UnimplementedAgentServiceServer) UnregisterAgentAsk(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnregisterAgentAsk not implemented")
 }
 func (UnimplementedAgentServiceServer) TryAgentAddress(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TryAgentAddress not implemented")
@@ -267,6 +283,24 @@ func _AgentService_DeleteScriptFile_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_UnregisterAgentAsk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).UnregisterAgentAsk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_UnregisterAgentAsk_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).UnregisterAgentAsk(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AgentService_TryAgentAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -313,6 +347,10 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AgentService_DeleteScriptFile_Handler,
 		},
 		{
+			MethodName: "UnregisterAgentAsk",
+			Handler:    _AgentService_UnregisterAgentAsk_Handler,
+		},
+		{
 			MethodName: "TryAgentAddress",
 			Handler:    _AgentService_TryAgentAddress_Handler,
 		},
@@ -334,7 +372,7 @@ const (
 // Service for manager communication
 type ManagerServiceClient interface {
 	RegisterAgent(ctx context.Context, in *RegisterAgentRequest, opts ...grpc.CallOption) (*RegisterAgentResponse, error)
-	UnregisterAgent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UnregisterAgent(ctx context.Context, in *UnregisterAgentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
 }
 
@@ -356,7 +394,7 @@ func (c *managerServiceClient) RegisterAgent(ctx context.Context, in *RegisterAg
 	return out, nil
 }
 
-func (c *managerServiceClient) UnregisterAgent(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *managerServiceClient) UnregisterAgent(ctx context.Context, in *UnregisterAgentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, ManagerService_UnregisterAgent_FullMethodName, in, out, cOpts...)
@@ -383,7 +421,7 @@ func (c *managerServiceClient) Heartbeat(ctx context.Context, in *HeartbeatReque
 // Service for manager communication
 type ManagerServiceServer interface {
 	RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error)
-	UnregisterAgent(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	UnregisterAgent(context.Context, *UnregisterAgentRequest) (*emptypb.Empty, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
 	mustEmbedUnimplementedManagerServiceServer()
 }
@@ -398,7 +436,7 @@ type UnimplementedManagerServiceServer struct{}
 func (UnimplementedManagerServiceServer) RegisterAgent(context.Context, *RegisterAgentRequest) (*RegisterAgentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterAgent not implemented")
 }
-func (UnimplementedManagerServiceServer) UnregisterAgent(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (UnimplementedManagerServiceServer) UnregisterAgent(context.Context, *UnregisterAgentRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnregisterAgent not implemented")
 }
 func (UnimplementedManagerServiceServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
@@ -444,7 +482,7 @@ func _ManagerService_RegisterAgent_Handler(srv interface{}, ctx context.Context,
 }
 
 func _ManagerService_UnregisterAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(UnregisterAgentRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -456,7 +494,7 @@ func _ManagerService_UnregisterAgent_Handler(srv interface{}, ctx context.Contex
 		FullMethod: ManagerService_UnregisterAgent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServiceServer).UnregisterAgent(ctx, req.(*emptypb.Empty))
+		return srv.(ManagerServiceServer).UnregisterAgent(ctx, req.(*UnregisterAgentRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

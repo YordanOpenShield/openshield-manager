@@ -86,6 +86,10 @@ message RegisterAgentResponse {
   string token = 2;
 }
 
+message UnregisterAgentRequest {
+  string id = 1;
+}
+
 // Service for agent communication
 service AgentService {
   // Tasks
@@ -98,12 +102,13 @@ service AgentService {
   rpc DeleteScriptFile(DeleteScriptRequest) returns (SyncStatus);
 
   // Agents
+  rpc UnregisterAgentAsk(google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc TryAgentAddress(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 // Service for manager communication
 service ManagerService {
   rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
-  rpc UnregisterAgent(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc UnregisterAgent(UnregisterAgentRequest) returns (google.protobuf.Empty);
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
 }

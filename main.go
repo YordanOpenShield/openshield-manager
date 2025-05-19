@@ -24,11 +24,13 @@ func main() {
 	// Initialize the database connection
 	db.ConnectDatabase()
 
-	// Initialize the gRPC server
-	err = managergrpc.StartGRPCServer(50052)
-	if err != nil {
-		log.Fatalf("Failed to start gRPC server: %v", err)
-	}
+	// Start the gRPC server in a goroutine
+	go func() {
+		err := managergrpc.StartGRPCServer(50052)
+		if err != nil {
+			log.Fatalf("Failed to start gRPC server: %v", err)
+		}
+	}()
 
 	// Start background tasks
 	stopScriptsSync := make(chan struct{})
@@ -41,7 +43,6 @@ func main() {
 	{
 		agents := apiGroup.Group("/agents")
 		{
-			agents.POST("/register", api.RegisterAgent)
 			agents.POST("/unregister", api.UnregisterAgent)
 			agents.GET("/list", api.GetAgentsList)
 			agents.GET("/:id", api.GetAgentDetails)
