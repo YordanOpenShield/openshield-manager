@@ -68,7 +68,8 @@ func AssignTaskToAgent(c *gin.Context) {
 		Id:          job.ID.String(),
 		Name:        job.Name,
 		Description: job.Description,
-		Command:     job.Command,
+		Type:        string(job.Type),
+		Target:      job.Target,
 	}
 	client.SendTask(c, protoTask, protoJob)
 

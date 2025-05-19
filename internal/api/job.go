@@ -29,7 +29,8 @@ func GetJobDetails(c *gin.Context) {
 type CreateJobRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Command     string `json:"command"`
+	Type        string `json:"type"`
+	Target      string `json:"target"`
 }
 
 func CreateJob(c *gin.Context) {
@@ -44,7 +45,8 @@ func CreateJob(c *gin.Context) {
 		ID:          uuid.New(),
 		Name:        req.Name,
 		Description: req.Description,
-		Command:     req.Command,
+		Type:        models.JobType(req.Type),
+		Target:      req.Target,
 	}
 	if err := db.DB.Create(&job).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create job: " + err.Error()})

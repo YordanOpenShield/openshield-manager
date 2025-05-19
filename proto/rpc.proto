@@ -8,7 +8,8 @@ message Job {
   string id = 1;
   string name = 2;
   string description = 3;
-  string command = 4;
+  string type = 4;
+  string target = 5;
 }
 
 message Task {

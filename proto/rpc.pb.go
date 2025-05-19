@@ -79,7 +79,8 @@ type Job struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Command       string                 `protobuf:"bytes,4,opt,name=command,proto3" json:"command,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Target        string                 `protobuf:"bytes,5,opt,name=target,proto3" json:"target,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -135,9 +136,16 @@ func (x *Job) GetDescription() string {
 	return ""
 }
 
-func (x *Job) GetCommand() string {
+func (x *Job) GetType() string {
 	if x != nil {
-		return x.Command
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Job) GetTarget() string {
+	if x != nil {
+		return x.Target
 	}
 	return ""
 }
@@ -910,12 +918,13 @@ var File_proto_rpc_proto protoreflect.FileDescriptor
 
 const file_proto_rpc_proto_rawDesc = "" +
 	"\n" +
-	"\x0fproto/rpc.proto\x1a\x1bgoogle/protobuf/empty.proto\"e\n" +
+	"\x0fproto/rpc.proto\x1a\x1bgoogle/protobuf/empty.proto\"w\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x18\n" +
-	"\acommand\x18\x04 \x01(\tR\acommand\"\x85\x01\n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x16\n" +
+	"\x06target\x18\x05 \x01(\tR\x06target\"\x85\x01\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x15\n" +
 	"\x06job_id\x18\x02 \x01(\tR\x05jobId\x12\x19\n" +
