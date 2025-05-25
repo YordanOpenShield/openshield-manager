@@ -34,7 +34,9 @@ func main() {
 
 	// Start background tasks
 	stopScriptsSync := make(chan struct{})
-	service.ScriptSyncMonitor(30*time.Second, stopScriptsSync)
+	service.ScriptSyncMonitor(60*time.Second, stopScriptsSync)
+	stopAgentMonitor := make(chan struct{})
+	service.AgentLastSeenMonitor(30*time.Second, stopAgentMonitor)
 
 	// Initialize the router
 	router := gin.Default()

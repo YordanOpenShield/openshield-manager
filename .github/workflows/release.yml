@@ -1,0 +1,62 @@
+name: Upload Release Binaries
+
+# This workflow builds release binaries for the OpenShield agent.
+on:
+  release:
+    types:
+      - created
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build executables
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64]
+        include:
+          - goos: linux
+            ext: ""
+          - goos: windows
+            ext: ".exe"
+          - goos: darwin
+            ext: ""
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Display the release tag
+        run: echo ${{ github.event.release.tag_name }}
+
+      - name: Build
+        run: |
+          mkdir -p dist
+          CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/openshield-agent-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}${{ matrix.ext }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openshield-agent-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}
+          path: dist/openshield-agent-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}${{ matrix.ext }}
+
+      - name: List executables
+        run: ls -l ./dist
+
+      - name: Upload release binaries
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          file: dist/openshield-agent*
+          overwrite: true
+          file_glob: true

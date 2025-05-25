@@ -25,7 +25,12 @@ func (s *ManagerServer) RegisterAgent(ctx context.Context, req *proto.RegisterAg
 		State:    "DISCONNECTED",
 	}
 
-	db.DB.Create(&agent)
+	if err := db.DB.Create(&agent).Error; err != nil {
+		log.Printf("[REGISTER] Failed to create agent: %v", err)
+		return nil, err
+	}
+
+	log.Printf("[REGISTER] New agent registered with ID: %s", agentID)
 
 	return &proto.RegisterAgentResponse{
 		Id:    agentID.String(),
@@ -62,8 +67,8 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 	// Check if the agent exists
 	var agent models.Agent
 	if err := db.DB.Where("id = ?", req.AgentId).First(&agent).Error; err != nil {
-		log.Printf("[HEARTBEAT] Agent not found: %s. Dropping connection.", req.AgentId)
-		return nil, nil
+		log.Printf("[HEARTBEAT] Agent not found: %s.", req.AgentId)
+		return nil, err
 	}
 
 	// Retrieve JSON data from the request
@@ -92,15 +97,15 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 		}
 	}
 
-	client, err := NewAgentClient(agent.Address)
+	addr, err := TryAgentAddresses(agent.ID.String())
 	if err != nil {
-		log.Printf("Failed to create gRPC client: %v", err)
+		log.Printf("Failed to connect to agent addresses: %v", err)
 		return &proto.HeartbeatResponse{Ok: false}, err
 	}
-	client.TryAgentAddresses(agent.ID.String())
 
 	// Update the agent's last seen time
 	agent.LastSeen = time.Now()
+	agent.Address = addr.Address
 	agent.State = "CONNECTED"
 	if err := db.DB.Save(&agent).Error; err != nil {
 		log.Printf("Failed to update agent last seen time: %v", err)
@@ -112,27 +117,35 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 
 // TryAgentAddresses attempts to connect to the agent using all its addresses.
 // On a successful connection, updates the agent's address in the database.
-func (c *AgentClient) TryAgentAddresses(agentID string) error {
+func TryAgentAddresses(agentID string) (*models.AgentAddress, error) {
 	var agent models.Agent
 	if err := db.DB.Where("id = ?", agentID).First(&agent).Error; err != nil {
-		return fmt.Errorf("agent not found: %w", err)
+		return nil, fmt.Errorf("agent not found: %w", err)
 	}
 
 	var addresses []models.AgentAddress
 	if err := db.DB.Where("agent_id = ?", agentID).Find(&addresses).Error; err != nil {
-		return fmt.Errorf("failed to get agent addresses: %w", err)
+		return nil, fmt.Errorf("failed to get agent addresses: %w", err)
 	}
 
 	for _, addr := range addresses {
-		_, err := c.client.TryAgentAddress(context.Background(), &emptypb.Empty{})
+		// Create a new gRPC client for each address
+		c, err := NewAgentClient(addr.Address)
+		if err != nil {
+			log.Fatalf("Failed to create gRPC client: %v", err)
+		}
+
+		// Attempt to connect to the agent using the address
+		log.Printf("Trying agent address: %s", addr.Address)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_, err = c.client.TryAgentAddress(ctx, &emptypb.Empty{})
 		if err == nil {
 			// Set this address as the primary one in the database
-			agent.Address = addr.Address
-			if err := db.DB.Save(&agent).Error; err != nil {
-				return fmt.Errorf("failed to update agent primary address: %w", err)
-			}
-			return nil
+			log.Printf("Connected to agent at address: %s", addr.Address)
+			return &addr, nil
 		}
+		log.Printf("Failed to connect to agent address %s: %v", addr.Address, err)
 	}
-	return fmt.Errorf("could not connect to any agent address")
+	return nil, fmt.Errorf("could not connect to any agent address")
 }

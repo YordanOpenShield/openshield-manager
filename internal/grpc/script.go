@@ -24,6 +24,8 @@ func SyncScripts(agentAddress string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) // use background context
 	defer cancel()
 
+	log.Printf("[SCRIPT SYNC] Syncing scripts with agent at %s", agentAddress)
+
 	// Step 1: Calculate local checksums
 	localChecksums := make(map[string]string)
 	err = filepath.Walk(scriptsDir, func(path string, info os.FileInfo, err error) error {
