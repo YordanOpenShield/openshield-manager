@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenShield Manager
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/openshield-manager
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target

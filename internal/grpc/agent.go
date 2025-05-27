@@ -73,7 +73,9 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 
 	// Retrieve JSON data from the request
 	var message struct {
-		Addresses []string `json:"addresses"`
+		Addresses []string              `json:"addresses"`
+		Services  []models.AgentService `json:"services"`
+		// OS        []string              `json:"os"`
 	}
 	if err := json.Unmarshal([]byte(req.Message), &message); err != nil {
 		log.Printf("Failed to unmarshal heartbeat response: %v", err)
@@ -93,6 +95,16 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 		}
 		if err := db.DB.Create(&address).Error; err != nil {
 			log.Printf("Failed to save agent address: %v", err)
+			return &proto.HeartbeatResponse{Ok: false}, err
+		}
+	}
+
+	for _, service := range message.Services {
+		service.AgentID = agent.ID
+		service.CreatedAt = time.Now()
+		service.UpdatedAt = time.Now()
+		if err := db.DB.Save(&service).Error; err != nil {
+			log.Printf("Failed to save agent service: %v", err)
 			return &proto.HeartbeatResponse{Ok: false}, err
 		}
 	}

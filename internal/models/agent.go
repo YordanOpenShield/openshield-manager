@@ -28,12 +28,9 @@ type AgentAddress struct {
 }
 
 type AgentService struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
-	AgentID   uuid.UUID `gorm:"type:uuid;index" json:"agent_id"`
-	Name      string    `json:"name"`
-	Port      int       `json:"port"`
-	Protocol  string    `json:"protocol"` // e.g., "tcp", "udp"
-	Status    string    `json:"status"`   // e.g., "running", "stopped"
+	AgentID   uuid.UUID `gorm:"type:uuid;primaryKey" json:"agent_id"`
+	Name      string    `gorm:"primaryKey" json:"name"`
+	State     string    `json:"state"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
