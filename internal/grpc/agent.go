@@ -148,16 +148,13 @@ func TryAgentAddresses(agentID string) (*models.AgentAddress, error) {
 		}
 
 		// Attempt to connect to the agent using the address
-		log.Printf("Trying agent address: %s", addr.Address)
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		_, err = c.client.TryAgentAddress(ctx, &emptypb.Empty{})
 		if err == nil {
 			// Set this address as the primary one in the database
-			log.Printf("Connected to agent at address: %s", addr.Address)
 			return &addr, nil
 		}
-		log.Printf("Failed to connect to agent address %s: %v", addr.Address, err)
 	}
 	return nil, fmt.Errorf("could not connect to any agent address")
 }
