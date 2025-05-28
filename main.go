@@ -63,6 +63,11 @@ func main() {
 			tasks.POST("/assign", api.AssignTaskToAgent)
 			tasks.GET("/list", api.GetAllTasks)
 		}
+		// Certificates endpoints
+		cert := apiGroup.Group("/cert")
+		{
+			cert.POST("/sign", api.SignAgentCSR)
+		}
 	}
 
 	router.Run(":9000")

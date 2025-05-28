@@ -2,10 +2,31 @@
 
 set -e
 
+OPENSHIELD_DIR="/etc/openshield"
+CERT_DIR="$OPENSHIELD_DIR/certs"
 AGENT_BIN="openshield-manager"
 SYSTEMD_UNIT="openshield-manager.service"
 INSTALL_DIR="/usr/local/bin"
 SYSTEMD_DIR="/etc/systemd/system"
+
+# Create necessary directories if they don't exist
+mkdir -p "$OPENSHIELD_DIR"
+mkdir -p "$CERT_DIR"
+
+echo "Generating certificates in $CERT_DIR"
+# Generate CA if not exists
+if [ ! -f "$CERT_DIR/ca.key" ]; then
+  openssl genrsa -out "$CERT_DIR/ca.key" 4096
+  openssl req -x509 -new -key "$CERT_DIR/ca.key" -sha256 -days 3650 -out "$CERT_DIR/ca.crt" -subj "/CN=OpenShieldCA"
+fi
+# Generate manager cert if not exists
+if [ ! -f "$CERT_DIR/manager.key" ]; then
+  openssl genrsa -out "$CERT_DIR/manager.key" 4096
+  openssl req -new -key "$CERT_DIR/manager.key" -out "$CERT_DIR/manager.csr" -subj "/CN=manager"
+  openssl x509 -req -in "$CERT_DIR/manager.csr" -CA "$CERT_DIR/ca.crt" -CAkey "$CERT_DIR/ca.key" -CAcreateserial -out "$CERT_DIR/manager.crt" -days 3650 -sha256
+fi
+
+echo "Manager and CA certificates generated in $CERT_DIR"
 
 # Detect OS
 OS="$(uname | tr '[:upper:]' '[:lower:]')"
@@ -67,9 +88,9 @@ elif [[ "$OS" == "darwin" ]]; then
         curl -L -o "$AGENT_BIN" "$AGENT_URL"
         chmod +x "$AGENT_BIN"
     fi
-    cp "$AGENT_BIN" /usr/local/bin/
-    chmod +x /usr/local/bin/$AGENT_BIN
-    echo "Manager installed to /usr/local/bin."
+    cp "$AGENT_BIN" "$INSTALL_DIR/"
+    chmod +x $INSTALL_DIR/$AGENT_BIN
+    echo "Manager installed to $INSTALL_DIR."
     echo "Note: macOS uses launchd, not systemd. Please create a launchd plist if you want to run as a service."
 
 else
