@@ -3,19 +3,24 @@ package api
 import (
 	"crypto/x509"
 	"encoding/pem"
-	"io"
 	"math/big"
+	"net"
 	"net/http"
-	"openshield-manager/internal/config"
 	"openshield-manager/internal/db"
 	"openshield-manager/internal/models"
-	"os"
+	"openshield-manager/internal/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 // POST /api/cert/sign
+// TODO: Export this function to the utils package (cert.go)
+type SignAgentCSRRequest struct {
+	SANHosts []string `json:"sanHosts" binding:"required"`
+	CSR      string   `json:"csr" binding:"required"` // PEM as string
+}
+
 func SignAgentCSR(c *gin.Context) {
 	// Check if the request has the required header
 	token := c.GetHeader("X-Agent-Token")
@@ -25,12 +30,23 @@ func SignAgentCSR(c *gin.Context) {
 		return
 	}
 
-	// Read CSR from request body
-	csrPEM, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read CSR"})
+	var req SignAgentCSRRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
+
+	// Convert SANHosts to IPs and DNS names
+	sanHosts := make([]net.IP, 0, len(req.SANHosts))
+	for _, addr := range req.SANHosts {
+		ip := net.ParseIP(addr)
+		if ip != nil {
+			sanHosts = append(sanHosts, ip)
+		}
+	}
+
+	// Read CSR from request body
+	csrPEM := []byte(req.CSR)
 	block, _ := pem.Decode(csrPEM)
 	if block == nil || block.Type != "CERTIFICATE REQUEST" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid CSR PEM"})
@@ -47,40 +63,10 @@ func SignAgentCSR(c *gin.Context) {
 	}
 
 	// Load CA cert and key
-	caCertPEM, err := os.ReadFile(config.CertsPath + "/ca.crt")
+	caKey, caCert, err := utils.LoadCA()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read CA cert"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load CA certificate"})
 		return
-	}
-	caKeyPEM, err := os.ReadFile(config.CertsPath + "/ca.key")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read CA key"})
-		return
-	}
-	caBlock, _ := pem.Decode(caCertPEM)
-	caKeyBlock, _ := pem.Decode(caKeyPEM)
-	if caBlock == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid CA cert PEM"})
-		return
-	}
-	if caKeyBlock == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid CA key PEM"})
-		return
-	}
-	caCert, err := x509.ParseCertificate(caBlock.Bytes)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse CA cert"})
-		return
-	}
-
-	var caKey interface{}
-	caKey, err = x509.ParsePKCS1PrivateKey(caKeyBlock.Bytes)
-	if err != nil {
-		caKey, err = x509.ParsePKCS8PrivateKey(caKeyBlock.Bytes)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse CA key"})
-			return
-		}
 	}
 
 	agentCertTmpl := &x509.Certificate{
@@ -91,6 +77,7 @@ func SignAgentCSR(c *gin.Context) {
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
+		IPAddresses:           sanHosts, // Add IP SANs here
 	}
 
 	certDER, err := x509.CreateCertificate(
@@ -101,6 +88,9 @@ func SignAgentCSR(c *gin.Context) {
 		return
 	}
 	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certDER})
+
+	// Encode CA cert to PEM
+	caCertPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caCert.Raw})
 
 	// Respond with agent cert and CA cert
 	c.JSON(http.StatusOK, gin.H{

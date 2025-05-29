@@ -139,6 +139,7 @@ func TryAgentAddresses(agentID string) (*models.AgentAddress, error) {
 	if err := db.DB.Where("agent_id = ?", agentID).Find(&addresses).Error; err != nil {
 		return nil, fmt.Errorf("failed to get agent addresses: %w", err)
 	}
+	log.Printf("[TRY ADDRESSES] Trying addresses for agent %s: %v", agentID, addresses)
 
 	for _, addr := range addresses {
 		// Create a new gRPC client for each address
@@ -155,6 +156,7 @@ func TryAgentAddresses(agentID string) (*models.AgentAddress, error) {
 			// Set this address as the primary one in the database
 			return &addr, nil
 		}
+		log.Printf("[TRY ADDRESSES] Failed to connect to agent address %s: %v", addr.Address, err)
 	}
 	return nil, fmt.Errorf("could not connect to any agent address")
 }

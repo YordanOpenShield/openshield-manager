@@ -40,6 +40,12 @@ func main() {
 	// Initialize the database connection
 	db.ConnectDatabase()
 
+	// Generate manager certificates
+	err = service.CreateCertificates()
+	if err != nil {
+		log.Fatalf("Failed to create certificates: %v", err)
+	}
+
 	// Start the RegisterAgent gRPC server
 	go func() {
 		err := managergrpc.StartManagerRegistrationServer(50053)
