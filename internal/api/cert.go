@@ -6,6 +6,8 @@ import (
 	"io"
 	"math/big"
 	"net/http"
+	"openshield-manager/internal/db"
+	"openshield-manager/internal/models"
 	"os"
 	"time"
 
@@ -14,6 +16,14 @@ import (
 
 // POST /api/cert/sign
 func SignAgentCSR(c *gin.Context) {
+	// Check if the request has the required header
+	token := c.GetHeader("X-Agent-Token")
+	var agent models.Agent
+	if err := db.DB.Where("token = ?", token).First(&agent).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid agent token"})
+		return
+	}
+
 	// Read CSR from request body
 	csrPEM, err := io.ReadAll(c.Request.Body)
 	if err != nil {

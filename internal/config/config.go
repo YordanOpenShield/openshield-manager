@@ -2,9 +2,27 @@ package config
 
 import (
 	"os"
+	"runtime"
 
 	"gopkg.in/yaml.v2"
 )
+
+var ConfigPath string = "config"
+var ScriptsPath string = "scripts"
+var CertsPath string = "certs"
+
+func init() {
+	switch runtime.GOOS {
+	case "windows":
+		ConfigPath = "C:\\ProgramData\\openshield\\config.yml"
+		ScriptsPath = "C:\\ProgramData\\openshield\\scripts"
+		CertsPath = "C:\\ProgramData\\openshield\\certs"
+	default:
+		ConfigPath = "/etc/openshield/config.yml"
+		ScriptsPath = "/etc/openshield/scripts"
+		CertsPath = "/etc/openshield/certs"
+	}
+}
 
 var GlobalConfig Config
 
@@ -18,8 +36,63 @@ type Config struct {
 	DB_SSLMODE  string `yaml:"DB_SSLMODE"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	data, err := os.ReadFile(path)
+func GenerateConfig(opts Config) *Config {
+	return &Config{
+		ENVIRONMENT: func() string {
+			if opts.ENVIRONMENT != "" {
+				return opts.ENVIRONMENT
+			} else {
+				return "development"
+			}
+		}(),
+		DB_HOST: func() string {
+			if opts.DB_HOST != "" {
+				return opts.DB_HOST
+			} else {
+				return "localhost"
+			}
+		}(),
+		DB_PORT: func() string {
+			if opts.DB_PORT != "" {
+				return opts.DB_PORT
+			} else {
+				return "5432"
+			}
+		}(),
+		DB_USER: func() string {
+			if opts.DB_USER != "" {
+				return opts.DB_USER
+			} else {
+				return "user"
+			}
+		}(),
+		DB_PASSWORD: func() string {
+			if opts.DB_PASSWORD != "" {
+				return opts.DB_PASSWORD
+			} else {
+				return "pass"
+			}
+		}(),
+		DB_NAME: func() string {
+			if opts.DB_NAME != "" {
+				return opts.DB_NAME
+			} else {
+				return "openshield"
+			}
+		}(),
+		DB_SSLMODE: func() string {
+			if opts.DB_SSLMODE != "" {
+				return opts.DB_SSLMODE
+			} else {
+				return "disable"
+			}
+		}(),
+	}
+}
+
+func LoadConfig(configPath string) (*Config, error) {
+	configFile := configPath + string(os.PathSeparator) + "config.yml"
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, err
 	}
