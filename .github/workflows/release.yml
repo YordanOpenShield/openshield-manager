@@ -1,6 +1,6 @@
 name: Upload Release Binaries
 
-# This workflow builds release binaries for the OpenShield agent.
+# This workflow builds release binaries for the OpenShield manager.
 on:
   release:
     types:
@@ -16,14 +16,10 @@ jobs:
 
     strategy:
       matrix:
-        goos: [linux, windows, darwin]
+        goos: [linux]
         goarch: [amd64]
         include:
           - goos: linux
-            ext: ""
-          - goos: windows
-            ext: ".exe"
-          - goos: darwin
             ext: ""
 
     steps:
@@ -41,13 +37,13 @@ jobs:
       - name: Build
         run: |
           mkdir -p dist
-          CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/openshield-agent-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}${{ matrix.ext }}
+          CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o dist/openshield-manager-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}${{ matrix.ext }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: openshield-agent-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}
-          path: dist/openshield-agent-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}${{ matrix.ext }}
+          name: openshield-manager-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}
+          path: dist/openshield-manager-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.event.release.tag_name }}${{ matrix.ext }}
 
       - name: List executables
         run: ls -l ./dist
@@ -57,6 +53,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: dist/openshield-agent*
+          file: dist/openshield-manager*
           overwrite: true
           file_glob: true
