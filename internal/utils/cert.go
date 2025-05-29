@@ -66,7 +66,7 @@ func GenerateManagerCert(caKey *rsa.PrivateKey, caCert *x509.Certificate, manage
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().Add(5 * 365 * 24 * time.Hour),
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
 		IPAddresses:           sanHosts, // Add IP SANs here
 	}
