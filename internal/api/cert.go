@@ -6,6 +6,7 @@ import (
 	"io"
 	"math/big"
 	"net/http"
+	"openshield-manager/internal/config"
 	"openshield-manager/internal/db"
 	"openshield-manager/internal/models"
 	"os"
@@ -46,13 +47,12 @@ func SignAgentCSR(c *gin.Context) {
 	}
 
 	// Load CA cert and key
-	// TODO: Use environment variables or config file for paths
-	caCertPEM, err := os.ReadFile("certs/ca.crt")
+	caCertPEM, err := os.ReadFile(config.CertsPath + "/ca.crt")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read CA cert"})
 		return
 	}
-	caKeyPEM, err := os.ReadFile("certs/ca.key")
+	caKeyPEM, err := os.ReadFile(config.CertsPath + "/ca.key")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read CA key"})
 		return

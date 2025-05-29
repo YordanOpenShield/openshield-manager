@@ -1,10 +1,11 @@
 package managergrpc
 
 import (
+	"openshield-manager/internal/utils"
 	"openshield-manager/proto"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 // AgentClient wraps the gRPC client and connection.
@@ -15,10 +16,15 @@ type AgentClient struct {
 
 // NewAgentClient initializes and returns a new AgentClient.
 func NewAgentClient(agentAddress string) (*AgentClient, error) {
+	// Load TLS credentials
+	tlsConfig, err := utils.LoadClientTLSCredentials()
+	if err != nil {
+		return nil, err
+	}
 
 	conn, err := grpc.NewClient(
 		agentAddress+":50051",
-		grpc.WithTransportCredentials(insecure.NewCredentials()), // Use TLS in production
+		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)), // Use TLS in production
 	)
 	if err != nil {
 		return nil, err

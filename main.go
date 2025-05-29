@@ -40,6 +40,14 @@ func main() {
 	// Initialize the database connection
 	db.ConnectDatabase()
 
+	// Start the RegisterAgent gRPC server
+	go func() {
+		err := managergrpc.StartManagerRegistrationServer(50053)
+		if err != nil {
+			log.Fatalf("Failed to start Manager Registration Server server: %v", err)
+		}
+	}()
+
 	// Start the gRPC server in a goroutine
 	go func() {
 		err := managergrpc.StartGRPCServer(50052)
@@ -80,7 +88,7 @@ func main() {
 			tasks.GET("/list", api.GetAllTasks)
 		}
 		// Certificates endpoints
-		cert := apiGroup.Group("/cert")
+		cert := apiGroup.Group("/certs")
 		{
 			cert.POST("/sign", api.SignAgentCSR)
 		}

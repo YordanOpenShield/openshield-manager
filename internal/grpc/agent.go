@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *ManagerServer) RegisterAgent(ctx context.Context, req *proto.RegisterAgentRequest) (*proto.RegisterAgentResponse, error) {
+func (s *ManagerRegistrationServer) RegisterAgent(ctx context.Context, req *proto.RegisterAgentRequest) (*proto.RegisterAgentResponse, error) {
 	// Create a new agent
 	agentID := uuid.New()
 	agent := models.Agent{
