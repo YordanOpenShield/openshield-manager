@@ -65,6 +65,8 @@ func main() {
 	// Start background tasks
 	stopScriptsSync := make(chan struct{})
 	service.ScriptSyncMonitor(60*time.Second, stopScriptsSync)
+	stopConfigsSync := make(chan struct{})
+	service.ConfigSyncMonitor(60*time.Second, stopConfigsSync)
 	stopAgentMonitor := make(chan struct{})
 	service.AgentLastSeenMonitor(30*time.Second, stopAgentMonitor)
 

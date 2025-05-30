@@ -27,6 +27,8 @@ const (
 	AgentService_DeleteScriptFile_FullMethodName   = "/AgentService/DeleteScriptFile"
 	AgentService_UnregisterAgentAsk_FullMethodName = "/AgentService/UnregisterAgentAsk"
 	AgentService_TryAgentAddress_FullMethodName    = "/AgentService/TryAgentAddress"
+	AgentService_GetConfigChecksums_FullMethodName = "/AgentService/GetConfigChecksums"
+	AgentService_SendConfigFile_FullMethodName     = "/AgentService/SendConfigFile"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -45,6 +47,9 @@ type AgentServiceClient interface {
 	// Agents
 	UnregisterAgentAsk(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	TryAgentAddress(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Config
+	GetConfigChecksums(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChecksumResponse, error)
+	SendConfigFile(ctx context.Context, in *FileContent, opts ...grpc.CallOption) (*SyncStatus, error)
 }
 
 type agentServiceClient struct {
@@ -125,6 +130,26 @@ func (c *agentServiceClient) TryAgentAddress(ctx context.Context, in *emptypb.Em
 	return out, nil
 }
 
+func (c *agentServiceClient) GetConfigChecksums(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChecksumResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChecksumResponse)
+	err := c.cc.Invoke(ctx, AgentService_GetConfigChecksums_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) SendConfigFile(ctx context.Context, in *FileContent, opts ...grpc.CallOption) (*SyncStatus, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SyncStatus)
+	err := c.cc.Invoke(ctx, AgentService_SendConfigFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
@@ -141,6 +166,9 @@ type AgentServiceServer interface {
 	// Agents
 	UnregisterAgentAsk(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	TryAgentAddress(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	// Config
+	GetConfigChecksums(context.Context, *emptypb.Empty) (*ChecksumResponse, error)
+	SendConfigFile(context.Context, *FileContent) (*SyncStatus, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -171,6 +199,12 @@ func (UnimplementedAgentServiceServer) UnregisterAgentAsk(context.Context, *empt
 }
 func (UnimplementedAgentServiceServer) TryAgentAddress(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TryAgentAddress not implemented")
+}
+func (UnimplementedAgentServiceServer) GetConfigChecksums(context.Context, *emptypb.Empty) (*ChecksumResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfigChecksums not implemented")
+}
+func (UnimplementedAgentServiceServer) SendConfigFile(context.Context, *FileContent) (*SyncStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendConfigFile not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -319,6 +353,42 @@ func _AgentService_TryAgentAddress_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_GetConfigChecksums_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).GetConfigChecksums(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_GetConfigChecksums_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).GetConfigChecksums(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_SendConfigFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileContent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).SendConfigFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_SendConfigFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).SendConfigFile(ctx, req.(*FileContent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -353,6 +423,14 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TryAgentAddress",
 			Handler:    _AgentService_TryAgentAddress_Handler,
+		},
+		{
+			MethodName: "GetConfigChecksums",
+			Handler:    _AgentService_GetConfigChecksums_Handler,
+		},
+		{
+			MethodName: "SendConfigFile",
+			Handler:    _AgentService_SendConfigFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

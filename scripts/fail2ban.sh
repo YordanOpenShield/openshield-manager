@@ -26,7 +26,7 @@ elif [ "$OS" = "mac" ]; then
 fi
 
 # Minimal fail2ban config
-sudo tee /etc/fail2ban/jail.local > /dev/null <<EOF
+sudo tee /etc/fail2ban/jail.local >/dev/null <<EOF
 [sshd]
 enabled = true
 EOF

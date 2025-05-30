@@ -434,7 +434,7 @@ func (x *JobStatusResponse) GetResult() string {
 	return ""
 }
 
-type ScriptChecksum struct {
+type Checksum struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
 	Checksum      string                 `protobuf:"bytes,2,opt,name=checksum,proto3" json:"checksum,omitempty"`
@@ -442,20 +442,20 @@ type ScriptChecksum struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ScriptChecksum) Reset() {
-	*x = ScriptChecksum{}
+func (x *Checksum) Reset() {
+	*x = Checksum{}
 	mi := &file_proto_rpc_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ScriptChecksum) String() string {
+func (x *Checksum) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ScriptChecksum) ProtoMessage() {}
+func (*Checksum) ProtoMessage() {}
 
-func (x *ScriptChecksum) ProtoReflect() protoreflect.Message {
+func (x *Checksum) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_rpc_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -467,19 +467,19 @@ func (x *ScriptChecksum) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ScriptChecksum.ProtoReflect.Descriptor instead.
-func (*ScriptChecksum) Descriptor() ([]byte, []int) {
+// Deprecated: Use Checksum.ProtoReflect.Descriptor instead.
+func (*Checksum) Descriptor() ([]byte, []int) {
 	return file_proto_rpc_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ScriptChecksum) GetFilename() string {
+func (x *Checksum) GetFilename() string {
 	if x != nil {
 		return x.Filename
 	}
 	return ""
 }
 
-func (x *ScriptChecksum) GetChecksum() string {
+func (x *Checksum) GetChecksum() string {
 	if x != nil {
 		return x.Checksum
 	}
@@ -488,7 +488,7 @@ func (x *ScriptChecksum) GetChecksum() string {
 
 type ChecksumResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Scripts       []*ScriptChecksum      `protobuf:"bytes,1,rep,name=scripts,proto3" json:"scripts,omitempty"`
+	Files         []*Checksum            `protobuf:"bytes,1,rep,name=files,proto3" json:"files,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -523,9 +523,9 @@ func (*ChecksumResponse) Descriptor() ([]byte, []int) {
 	return file_proto_rpc_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *ChecksumResponse) GetScripts() []*ScriptChecksum {
+func (x *ChecksumResponse) GetFiles() []*Checksum {
 	if x != nil {
-		return x.Scripts
+		return x.Files
 	}
 	return nil
 }
@@ -942,12 +942,12 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\x11JobStatusResponse\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12#\n" +
 	"\x06status\x18\x02 \x01(\x0e2\v.TaskStatusR\x06status\x12\x16\n" +
-	"\x06result\x18\x03 \x01(\tR\x06result\"H\n" +
-	"\x0eScriptChecksum\x12\x1a\n" +
+	"\x06result\x18\x03 \x01(\tR\x06result\"B\n" +
+	"\bChecksum\x12\x1a\n" +
 	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x1a\n" +
-	"\bchecksum\x18\x02 \x01(\tR\bchecksum\"=\n" +
-	"\x10ChecksumResponse\x12)\n" +
-	"\ascripts\x18\x01 \x03(\v2\x0f.ScriptChecksumR\ascripts\"C\n" +
+	"\bchecksum\x18\x02 \x01(\tR\bchecksum\"3\n" +
+	"\x10ChecksumResponse\x12\x1f\n" +
+	"\x05files\x18\x01 \x03(\v2\t.ChecksumR\x05files\"C\n" +
 	"\vFileContent\x12\x1a\n" +
 	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\fR\acontent\"@\n" +
@@ -975,7 +975,7 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\aRUNNING\x10\x01\x12\r\n" +
 	"\tCOMPLETED\x10\x02\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x032\xae\x03\n" +
+	"\x06FAILED\x10\x032\x9c\x04\n" +
 	"\fAgentService\x125\n" +
 	"\n" +
 	"AssignTask\x12\x12.AssignTaskRequest\x1a\x13.AssignTaskResponse\x129\n" +
@@ -984,7 +984,9 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\x0eSendScriptFile\x12\f.FileContent\x1a\v.SyncStatus\x125\n" +
 	"\x10DeleteScriptFile\x12\x14.DeleteScriptRequest\x1a\v.SyncStatus\x12D\n" +
 	"\x12UnregisterAgentAsk\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12A\n" +
-	"\x0fTryAgentAddress\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2\xc8\x01\n" +
+	"\x0fTryAgentAddress\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12?\n" +
+	"\x12GetConfigChecksums\x12\x16.google.protobuf.Empty\x1a\x11.ChecksumResponse\x12+\n" +
+	"\x0eSendConfigFile\x12\f.FileContent\x1a\v.SyncStatus2\xc8\x01\n" +
 	"\x0eManagerService\x12>\n" +
 	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\x12B\n" +
 	"\x0fUnregisterAgent\x12\x17.UnregisterAgentRequest\x1a\x16.google.protobuf.Empty\x122\n" +
@@ -1012,7 +1014,7 @@ var file_proto_rpc_proto_goTypes = []any{
 	(*AssignTaskResponse)(nil),     // 4: AssignTaskResponse
 	(*JobStatusRequest)(nil),       // 5: JobStatusRequest
 	(*JobStatusResponse)(nil),      // 6: JobStatusResponse
-	(*ScriptChecksum)(nil),         // 7: ScriptChecksum
+	(*Checksum)(nil),               // 7: Checksum
 	(*ChecksumResponse)(nil),       // 8: ChecksumResponse
 	(*FileContent)(nil),            // 9: FileContent
 	(*SyncStatus)(nil),             // 10: SyncStatus
@@ -1029,7 +1031,7 @@ var file_proto_rpc_proto_depIdxs = []int32{
 	2,  // 1: AssignTaskRequest.task:type_name -> Task
 	1,  // 2: AssignTaskRequest.job:type_name -> Job
 	0,  // 3: JobStatusResponse.status:type_name -> TaskStatus
-	7,  // 4: ChecksumResponse.scripts:type_name -> ScriptChecksum
+	7,  // 4: ChecksumResponse.files:type_name -> Checksum
 	3,  // 5: AgentService.AssignTask:input_type -> AssignTaskRequest
 	5,  // 6: AgentService.ReportTaskStatus:input_type -> JobStatusRequest
 	17, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
@@ -1037,21 +1039,25 @@ var file_proto_rpc_proto_depIdxs = []int32{
 	11, // 9: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
 	17, // 10: AgentService.UnregisterAgentAsk:input_type -> google.protobuf.Empty
 	17, // 11: AgentService.TryAgentAddress:input_type -> google.protobuf.Empty
-	14, // 12: ManagerService.RegisterAgent:input_type -> RegisterAgentRequest
-	16, // 13: ManagerService.UnregisterAgent:input_type -> UnregisterAgentRequest
-	12, // 14: ManagerService.Heartbeat:input_type -> HeartbeatRequest
-	4,  // 15: AgentService.AssignTask:output_type -> AssignTaskResponse
-	6,  // 16: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
-	8,  // 17: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
-	10, // 18: AgentService.SendScriptFile:output_type -> SyncStatus
-	10, // 19: AgentService.DeleteScriptFile:output_type -> SyncStatus
-	17, // 20: AgentService.UnregisterAgentAsk:output_type -> google.protobuf.Empty
-	17, // 21: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
-	15, // 22: ManagerService.RegisterAgent:output_type -> RegisterAgentResponse
-	17, // 23: ManagerService.UnregisterAgent:output_type -> google.protobuf.Empty
-	13, // 24: ManagerService.Heartbeat:output_type -> HeartbeatResponse
-	15, // [15:25] is the sub-list for method output_type
-	5,  // [5:15] is the sub-list for method input_type
+	17, // 12: AgentService.GetConfigChecksums:input_type -> google.protobuf.Empty
+	9,  // 13: AgentService.SendConfigFile:input_type -> FileContent
+	14, // 14: ManagerService.RegisterAgent:input_type -> RegisterAgentRequest
+	16, // 15: ManagerService.UnregisterAgent:input_type -> UnregisterAgentRequest
+	12, // 16: ManagerService.Heartbeat:input_type -> HeartbeatRequest
+	4,  // 17: AgentService.AssignTask:output_type -> AssignTaskResponse
+	6,  // 18: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
+	8,  // 19: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
+	10, // 20: AgentService.SendScriptFile:output_type -> SyncStatus
+	10, // 21: AgentService.DeleteScriptFile:output_type -> SyncStatus
+	17, // 22: AgentService.UnregisterAgentAsk:output_type -> google.protobuf.Empty
+	17, // 23: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
+	8,  // 24: AgentService.GetConfigChecksums:output_type -> ChecksumResponse
+	10, // 25: AgentService.SendConfigFile:output_type -> SyncStatus
+	15, // 26: ManagerService.RegisterAgent:output_type -> RegisterAgentResponse
+	17, // 27: ManagerService.UnregisterAgent:output_type -> google.protobuf.Empty
+	13, // 28: ManagerService.Heartbeat:output_type -> HeartbeatResponse
+	17, // [17:29] is the sub-list for method output_type
+	5,  // [5:17] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
