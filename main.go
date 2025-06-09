@@ -10,8 +10,6 @@ import (
 	"openshield-manager/internal/service"
 	"openshield-manager/internal/utils"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -70,37 +68,7 @@ func main() {
 	stopAgentMonitor := make(chan struct{})
 	service.AgentLastSeenMonitor(30*time.Second, stopAgentMonitor)
 
-	// Initialize the router
-	router := gin.Default()
-	// External API routes
-	apiGroup := router.Group("/api")
-	{
-		agents := apiGroup.Group("/agents")
-		{
-			agents.POST("/unregister", api.UnregisterAgent)
-			agents.GET("/list", api.GetAgentsList)
-			agents.GET("/:id", api.GetAgentDetails)
-			agents.GET("/:id/tasks", api.GetTasksByAgent)
-		}
-		// Jobs endpoints
-		jobs := apiGroup.Group("/jobs")
-		{
-			jobs.GET("/list", api.GetJobs)
-			jobs.GET("/:id", api.GetJobDetails)
-			jobs.POST("/create", api.CreateJob)
-		}
-		// Tasks endpoints
-		tasks := apiGroup.Group("/tasks")
-		{
-			tasks.POST("/assign", api.AssignTaskToAgent)
-			tasks.GET("/list", api.GetAllTasks)
-		}
-		// Certificates endpoints
-		cert := apiGroup.Group("/certs")
-		{
-			cert.POST("/sign", api.SignAgentCSR)
-		}
-	}
-
+	// Start the API router
+	router := api.CreateRouter()
 	router.Run(":9000")
 }

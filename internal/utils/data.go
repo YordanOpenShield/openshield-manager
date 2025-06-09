@@ -3,6 +3,8 @@ package utils
 import (
 	"fmt"
 	"net"
+	"strings"
+	"unicode/utf8"
 )
 
 // GetAllLocalAddresses returns all non-loopback, non-APIPA IPv4 addresses.
@@ -29,4 +31,11 @@ func GetAllLocalAddresses() ([]string, error) {
 		return nil, fmt.Errorf("no non-loopback addresses found")
 	}
 	return addresses, nil
+}
+
+func SanitizeString(input string) string {
+	if utf8.ValidString(input) {
+		return input
+	}
+	return strings.ToValidUTF8(input, "�")
 }

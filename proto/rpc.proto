@@ -91,6 +91,46 @@ message UnregisterAgentRequest {
   string id = 1;
 }
 
+message Tool {
+  string name = 1;
+  repeated ToolAction actions = 2; // Actions the tool can perform
+  repeated string os = 3;
+}
+
+message ToolAction {
+  string name = 1;
+  repeated string options = 2;
+}
+
+message GetToolsResponse {
+  repeated Tool tools = 1;
+}
+
+message ExecuteToolRequest {
+  string name = 1;
+  string action = 2;
+  repeated string options = 3;
+}
+
+message ExecuteToolResponse {
+  string name = 1;
+  string action = 2;
+  bool accepted = 3;
+  string message = 4;
+}
+
+message ToolExecutionStatusRequest {
+  string name = 1;
+  string action = 2;
+}
+
+message ToolExecutionStatusResponse {
+  string name = 1;
+  string action = 2;
+  TaskStatus status = 3;
+  string result = 4;
+}
+
 // Service for agent communication
 service AgentService {
   // Tasks
@@ -109,6 +149,11 @@ service AgentService {
   // Config
   rpc GetConfigChecksums(google.protobuf.Empty) returns (ChecksumResponse);
   rpc SendConfigFile(FileContent) returns (SyncStatus);
+
+  // Tools
+  rpc GetTools(google.protobuf.Empty) returns (GetToolsResponse);
+  rpc ExecuteTool(ExecuteToolRequest) returns (ExecuteToolResponse);
+  rpc ReportToolExecutionStatus(ToolExecutionStatusRequest) returns (ToolExecutionStatusResponse);
 }
 
 // Service for manager communication

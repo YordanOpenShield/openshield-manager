@@ -20,15 +20,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AgentService_AssignTask_FullMethodName         = "/AgentService/AssignTask"
-	AgentService_ReportTaskStatus_FullMethodName   = "/AgentService/ReportTaskStatus"
-	AgentService_GetScriptChecksums_FullMethodName = "/AgentService/GetScriptChecksums"
-	AgentService_SendScriptFile_FullMethodName     = "/AgentService/SendScriptFile"
-	AgentService_DeleteScriptFile_FullMethodName   = "/AgentService/DeleteScriptFile"
-	AgentService_UnregisterAgentAsk_FullMethodName = "/AgentService/UnregisterAgentAsk"
-	AgentService_TryAgentAddress_FullMethodName    = "/AgentService/TryAgentAddress"
-	AgentService_GetConfigChecksums_FullMethodName = "/AgentService/GetConfigChecksums"
-	AgentService_SendConfigFile_FullMethodName     = "/AgentService/SendConfigFile"
+	AgentService_AssignTask_FullMethodName                = "/AgentService/AssignTask"
+	AgentService_ReportTaskStatus_FullMethodName          = "/AgentService/ReportTaskStatus"
+	AgentService_GetScriptChecksums_FullMethodName        = "/AgentService/GetScriptChecksums"
+	AgentService_SendScriptFile_FullMethodName            = "/AgentService/SendScriptFile"
+	AgentService_DeleteScriptFile_FullMethodName          = "/AgentService/DeleteScriptFile"
+	AgentService_UnregisterAgentAsk_FullMethodName        = "/AgentService/UnregisterAgentAsk"
+	AgentService_TryAgentAddress_FullMethodName           = "/AgentService/TryAgentAddress"
+	AgentService_GetConfigChecksums_FullMethodName        = "/AgentService/GetConfigChecksums"
+	AgentService_SendConfigFile_FullMethodName            = "/AgentService/SendConfigFile"
+	AgentService_GetTools_FullMethodName                  = "/AgentService/GetTools"
+	AgentService_ExecuteTool_FullMethodName               = "/AgentService/ExecuteTool"
+	AgentService_ReportToolExecutionStatus_FullMethodName = "/AgentService/ReportToolExecutionStatus"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -50,6 +53,10 @@ type AgentServiceClient interface {
 	// Config
 	GetConfigChecksums(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChecksumResponse, error)
 	SendConfigFile(ctx context.Context, in *FileContent, opts ...grpc.CallOption) (*SyncStatus, error)
+	// Tools
+	GetTools(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetToolsResponse, error)
+	ExecuteTool(ctx context.Context, in *ExecuteToolRequest, opts ...grpc.CallOption) (*ExecuteToolResponse, error)
+	ReportToolExecutionStatus(ctx context.Context, in *ToolExecutionStatusRequest, opts ...grpc.CallOption) (*ToolExecutionStatusResponse, error)
 }
 
 type agentServiceClient struct {
@@ -150,6 +157,36 @@ func (c *agentServiceClient) SendConfigFile(ctx context.Context, in *FileContent
 	return out, nil
 }
 
+func (c *agentServiceClient) GetTools(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetToolsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetToolsResponse)
+	err := c.cc.Invoke(ctx, AgentService_GetTools_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) ExecuteTool(ctx context.Context, in *ExecuteToolRequest, opts ...grpc.CallOption) (*ExecuteToolResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExecuteToolResponse)
+	err := c.cc.Invoke(ctx, AgentService_ExecuteTool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *agentServiceClient) ReportToolExecutionStatus(ctx context.Context, in *ToolExecutionStatusRequest, opts ...grpc.CallOption) (*ToolExecutionStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ToolExecutionStatusResponse)
+	err := c.cc.Invoke(ctx, AgentService_ReportToolExecutionStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServiceServer is the server API for AgentService service.
 // All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility.
@@ -169,6 +206,10 @@ type AgentServiceServer interface {
 	// Config
 	GetConfigChecksums(context.Context, *emptypb.Empty) (*ChecksumResponse, error)
 	SendConfigFile(context.Context, *FileContent) (*SyncStatus, error)
+	// Tools
+	GetTools(context.Context, *emptypb.Empty) (*GetToolsResponse, error)
+	ExecuteTool(context.Context, *ExecuteToolRequest) (*ExecuteToolResponse, error)
+	ReportToolExecutionStatus(context.Context, *ToolExecutionStatusRequest) (*ToolExecutionStatusResponse, error)
 	mustEmbedUnimplementedAgentServiceServer()
 }
 
@@ -205,6 +246,15 @@ func (UnimplementedAgentServiceServer) GetConfigChecksums(context.Context, *empt
 }
 func (UnimplementedAgentServiceServer) SendConfigFile(context.Context, *FileContent) (*SyncStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendConfigFile not implemented")
+}
+func (UnimplementedAgentServiceServer) GetTools(context.Context, *emptypb.Empty) (*GetToolsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTools not implemented")
+}
+func (UnimplementedAgentServiceServer) ExecuteTool(context.Context, *ExecuteToolRequest) (*ExecuteToolResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExecuteTool not implemented")
+}
+func (UnimplementedAgentServiceServer) ReportToolExecutionStatus(context.Context, *ToolExecutionStatusRequest) (*ToolExecutionStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReportToolExecutionStatus not implemented")
 }
 func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 func (UnimplementedAgentServiceServer) testEmbeddedByValue()                      {}
@@ -389,6 +439,60 @@ func _AgentService_SendConfigFile_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AgentService_GetTools_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).GetTools(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_GetTools_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).GetTools(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_ExecuteTool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExecuteToolRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).ExecuteTool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_ExecuteTool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).ExecuteTool(ctx, req.(*ExecuteToolRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AgentService_ReportToolExecutionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ToolExecutionStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServiceServer).ReportToolExecutionStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AgentService_ReportToolExecutionStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServiceServer).ReportToolExecutionStatus(ctx, req.(*ToolExecutionStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AgentService_ServiceDesc is the grpc.ServiceDesc for AgentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -431,6 +535,18 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendConfigFile",
 			Handler:    _AgentService_SendConfigFile_Handler,
+		},
+		{
+			MethodName: "GetTools",
+			Handler:    _AgentService_GetTools_Handler,
+		},
+		{
+			MethodName: "ExecuteTool",
+			Handler:    _AgentService_ExecuteTool_Handler,
+		},
+		{
+			MethodName: "ReportToolExecutionStatus",
+			Handler:    _AgentService_ReportToolExecutionStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

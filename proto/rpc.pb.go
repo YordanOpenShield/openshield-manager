@@ -914,6 +914,410 @@ func (x *UnregisterAgentRequest) GetId() string {
 	return ""
 }
 
+type Tool struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Actions       []*ToolAction          `protobuf:"bytes,2,rep,name=actions,proto3" json:"actions,omitempty"` // Actions the tool can perform
+	Os            []string               `protobuf:"bytes,3,rep,name=os,proto3" json:"os,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Tool) Reset() {
+	*x = Tool{}
+	mi := &file_proto_rpc_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Tool) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tool) ProtoMessage() {}
+
+func (x *Tool) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tool.ProtoReflect.Descriptor instead.
+func (*Tool) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *Tool) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Tool) GetActions() []*ToolAction {
+	if x != nil {
+		return x.Actions
+	}
+	return nil
+}
+
+func (x *Tool) GetOs() []string {
+	if x != nil {
+		return x.Os
+	}
+	return nil
+}
+
+type ToolAction struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Options       []string               `protobuf:"bytes,2,rep,name=options,proto3" json:"options,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolAction) Reset() {
+	*x = ToolAction{}
+	mi := &file_proto_rpc_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolAction) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolAction) ProtoMessage() {}
+
+func (x *ToolAction) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolAction.ProtoReflect.Descriptor instead.
+func (*ToolAction) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ToolAction) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ToolAction) GetOptions() []string {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+type GetToolsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tools         []*Tool                `protobuf:"bytes,1,rep,name=tools,proto3" json:"tools,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetToolsResponse) Reset() {
+	*x = GetToolsResponse{}
+	mi := &file_proto_rpc_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetToolsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetToolsResponse) ProtoMessage() {}
+
+func (x *GetToolsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetToolsResponse.ProtoReflect.Descriptor instead.
+func (*GetToolsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetToolsResponse) GetTools() []*Tool {
+	if x != nil {
+		return x.Tools
+	}
+	return nil
+}
+
+type ExecuteToolRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Action        string                 `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`
+	Options       []string               `protobuf:"bytes,3,rep,name=options,proto3" json:"options,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExecuteToolRequest) Reset() {
+	*x = ExecuteToolRequest{}
+	mi := &file_proto_rpc_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExecuteToolRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecuteToolRequest) ProtoMessage() {}
+
+func (x *ExecuteToolRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecuteToolRequest.ProtoReflect.Descriptor instead.
+func (*ExecuteToolRequest) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ExecuteToolRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ExecuteToolRequest) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *ExecuteToolRequest) GetOptions() []string {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+type ExecuteToolResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Action        string                 `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`
+	Accepted      bool                   `protobuf:"varint,3,opt,name=accepted,proto3" json:"accepted,omitempty"`
+	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExecuteToolResponse) Reset() {
+	*x = ExecuteToolResponse{}
+	mi := &file_proto_rpc_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExecuteToolResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecuteToolResponse) ProtoMessage() {}
+
+func (x *ExecuteToolResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecuteToolResponse.ProtoReflect.Descriptor instead.
+func (*ExecuteToolResponse) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ExecuteToolResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ExecuteToolResponse) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *ExecuteToolResponse) GetAccepted() bool {
+	if x != nil {
+		return x.Accepted
+	}
+	return false
+}
+
+func (x *ExecuteToolResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type ToolExecutionStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Action        string                 `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolExecutionStatusRequest) Reset() {
+	*x = ToolExecutionStatusRequest{}
+	mi := &file_proto_rpc_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolExecutionStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolExecutionStatusRequest) ProtoMessage() {}
+
+func (x *ToolExecutionStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolExecutionStatusRequest.ProtoReflect.Descriptor instead.
+func (*ToolExecutionStatusRequest) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ToolExecutionStatusRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ToolExecutionStatusRequest) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+type ToolExecutionStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Action        string                 `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`
+	Status        TaskStatus             `protobuf:"varint,3,opt,name=status,proto3,enum=TaskStatus" json:"status,omitempty"`
+	Result        string                 `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ToolExecutionStatusResponse) Reset() {
+	*x = ToolExecutionStatusResponse{}
+	mi := &file_proto_rpc_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ToolExecutionStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ToolExecutionStatusResponse) ProtoMessage() {}
+
+func (x *ToolExecutionStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_rpc_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ToolExecutionStatusResponse.ProtoReflect.Descriptor instead.
+func (*ToolExecutionStatusResponse) Descriptor() ([]byte, []int) {
+	return file_proto_rpc_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ToolExecutionStatusResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ToolExecutionStatusResponse) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *ToolExecutionStatusResponse) GetStatus() TaskStatus {
+	if x != nil {
+		return x.Status
+	}
+	return TaskStatus_PENDING
+}
+
+func (x *ToolExecutionStatusResponse) GetResult() string {
+	if x != nil {
+		return x.Result
+	}
+	return ""
+}
+
 var File_proto_rpc_proto protoreflect.FileDescriptor
 
 const file_proto_rpc_proto_rawDesc = "" +
@@ -968,14 +1372,41 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\"(\n" +
 	"\x16UnregisterAgentRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id*A\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"Q\n" +
+	"\x04Tool\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12%\n" +
+	"\aactions\x18\x02 \x03(\v2\v.ToolActionR\aactions\x12\x0e\n" +
+	"\x02os\x18\x03 \x03(\tR\x02os\":\n" +
+	"\n" +
+	"ToolAction\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
+	"\aoptions\x18\x02 \x03(\tR\aoptions\"/\n" +
+	"\x10GetToolsResponse\x12\x1b\n" +
+	"\x05tools\x18\x01 \x03(\v2\x05.ToolR\x05tools\"Z\n" +
+	"\x12ExecuteToolRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06action\x18\x02 \x01(\tR\x06action\x12\x18\n" +
+	"\aoptions\x18\x03 \x03(\tR\aoptions\"w\n" +
+	"\x13ExecuteToolResponse\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06action\x18\x02 \x01(\tR\x06action\x12\x1a\n" +
+	"\baccepted\x18\x03 \x01(\bR\baccepted\x12\x18\n" +
+	"\amessage\x18\x04 \x01(\tR\amessage\"H\n" +
+	"\x1aToolExecutionStatusRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06action\x18\x02 \x01(\tR\x06action\"\x86\x01\n" +
+	"\x1bToolExecutionStatusResponse\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06action\x18\x02 \x01(\tR\x06action\x12#\n" +
+	"\x06status\x18\x03 \x01(\x0e2\v.TaskStatusR\x06status\x12\x16\n" +
+	"\x06result\x18\x04 \x01(\tR\x06result*A\n" +
 	"\n" +
 	"TaskStatus\x12\v\n" +
 	"\aPENDING\x10\x00\x12\v\n" +
 	"\aRUNNING\x10\x01\x12\r\n" +
 	"\tCOMPLETED\x10\x02\x12\n" +
 	"\n" +
-	"\x06FAILED\x10\x032\x9c\x04\n" +
+	"\x06FAILED\x10\x032\xe5\x05\n" +
 	"\fAgentService\x125\n" +
 	"\n" +
 	"AssignTask\x12\x12.AssignTaskRequest\x1a\x13.AssignTaskResponse\x129\n" +
@@ -986,7 +1417,10 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\x12UnregisterAgentAsk\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12A\n" +
 	"\x0fTryAgentAddress\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12?\n" +
 	"\x12GetConfigChecksums\x12\x16.google.protobuf.Empty\x1a\x11.ChecksumResponse\x12+\n" +
-	"\x0eSendConfigFile\x12\f.FileContent\x1a\v.SyncStatus2\xc8\x01\n" +
+	"\x0eSendConfigFile\x12\f.FileContent\x1a\v.SyncStatus\x125\n" +
+	"\bGetTools\x12\x16.google.protobuf.Empty\x1a\x11.GetToolsResponse\x128\n" +
+	"\vExecuteTool\x12\x13.ExecuteToolRequest\x1a\x14.ExecuteToolResponse\x12V\n" +
+	"\x19ReportToolExecutionStatus\x12\x1b.ToolExecutionStatusRequest\x1a\x1c.ToolExecutionStatusResponse2\xc8\x01\n" +
 	"\x0eManagerService\x12>\n" +
 	"\rRegisterAgent\x12\x15.RegisterAgentRequest\x1a\x16.RegisterAgentResponse\x12B\n" +
 	"\x0fUnregisterAgent\x12\x17.UnregisterAgentRequest\x1a\x16.google.protobuf.Empty\x122\n" +
@@ -1005,26 +1439,33 @@ func file_proto_rpc_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_rpc_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_proto_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_proto_rpc_proto_goTypes = []any{
-	(TaskStatus)(0),                // 0: TaskStatus
-	(*Job)(nil),                    // 1: Job
-	(*Task)(nil),                   // 2: Task
-	(*AssignTaskRequest)(nil),      // 3: AssignTaskRequest
-	(*AssignTaskResponse)(nil),     // 4: AssignTaskResponse
-	(*JobStatusRequest)(nil),       // 5: JobStatusRequest
-	(*JobStatusResponse)(nil),      // 6: JobStatusResponse
-	(*Checksum)(nil),               // 7: Checksum
-	(*ChecksumResponse)(nil),       // 8: ChecksumResponse
-	(*FileContent)(nil),            // 9: FileContent
-	(*SyncStatus)(nil),             // 10: SyncStatus
-	(*DeleteScriptRequest)(nil),    // 11: DeleteScriptRequest
-	(*HeartbeatRequest)(nil),       // 12: HeartbeatRequest
-	(*HeartbeatResponse)(nil),      // 13: HeartbeatResponse
-	(*RegisterAgentRequest)(nil),   // 14: RegisterAgentRequest
-	(*RegisterAgentResponse)(nil),  // 15: RegisterAgentResponse
-	(*UnregisterAgentRequest)(nil), // 16: UnregisterAgentRequest
-	(*emptypb.Empty)(nil),          // 17: google.protobuf.Empty
+	(TaskStatus)(0),                     // 0: TaskStatus
+	(*Job)(nil),                         // 1: Job
+	(*Task)(nil),                        // 2: Task
+	(*AssignTaskRequest)(nil),           // 3: AssignTaskRequest
+	(*AssignTaskResponse)(nil),          // 4: AssignTaskResponse
+	(*JobStatusRequest)(nil),            // 5: JobStatusRequest
+	(*JobStatusResponse)(nil),           // 6: JobStatusResponse
+	(*Checksum)(nil),                    // 7: Checksum
+	(*ChecksumResponse)(nil),            // 8: ChecksumResponse
+	(*FileContent)(nil),                 // 9: FileContent
+	(*SyncStatus)(nil),                  // 10: SyncStatus
+	(*DeleteScriptRequest)(nil),         // 11: DeleteScriptRequest
+	(*HeartbeatRequest)(nil),            // 12: HeartbeatRequest
+	(*HeartbeatResponse)(nil),           // 13: HeartbeatResponse
+	(*RegisterAgentRequest)(nil),        // 14: RegisterAgentRequest
+	(*RegisterAgentResponse)(nil),       // 15: RegisterAgentResponse
+	(*UnregisterAgentRequest)(nil),      // 16: UnregisterAgentRequest
+	(*Tool)(nil),                        // 17: Tool
+	(*ToolAction)(nil),                  // 18: ToolAction
+	(*GetToolsResponse)(nil),            // 19: GetToolsResponse
+	(*ExecuteToolRequest)(nil),          // 20: ExecuteToolRequest
+	(*ExecuteToolResponse)(nil),         // 21: ExecuteToolResponse
+	(*ToolExecutionStatusRequest)(nil),  // 22: ToolExecutionStatusRequest
+	(*ToolExecutionStatusResponse)(nil), // 23: ToolExecutionStatusResponse
+	(*emptypb.Empty)(nil),               // 24: google.protobuf.Empty
 }
 var file_proto_rpc_proto_depIdxs = []int32{
 	0,  // 0: Task.status:type_name -> TaskStatus
@@ -1032,35 +1473,44 @@ var file_proto_rpc_proto_depIdxs = []int32{
 	1,  // 2: AssignTaskRequest.job:type_name -> Job
 	0,  // 3: JobStatusResponse.status:type_name -> TaskStatus
 	7,  // 4: ChecksumResponse.files:type_name -> Checksum
-	3,  // 5: AgentService.AssignTask:input_type -> AssignTaskRequest
-	5,  // 6: AgentService.ReportTaskStatus:input_type -> JobStatusRequest
-	17, // 7: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
-	9,  // 8: AgentService.SendScriptFile:input_type -> FileContent
-	11, // 9: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
-	17, // 10: AgentService.UnregisterAgentAsk:input_type -> google.protobuf.Empty
-	17, // 11: AgentService.TryAgentAddress:input_type -> google.protobuf.Empty
-	17, // 12: AgentService.GetConfigChecksums:input_type -> google.protobuf.Empty
-	9,  // 13: AgentService.SendConfigFile:input_type -> FileContent
-	14, // 14: ManagerService.RegisterAgent:input_type -> RegisterAgentRequest
-	16, // 15: ManagerService.UnregisterAgent:input_type -> UnregisterAgentRequest
-	12, // 16: ManagerService.Heartbeat:input_type -> HeartbeatRequest
-	4,  // 17: AgentService.AssignTask:output_type -> AssignTaskResponse
-	6,  // 18: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
-	8,  // 19: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
-	10, // 20: AgentService.SendScriptFile:output_type -> SyncStatus
-	10, // 21: AgentService.DeleteScriptFile:output_type -> SyncStatus
-	17, // 22: AgentService.UnregisterAgentAsk:output_type -> google.protobuf.Empty
-	17, // 23: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
-	8,  // 24: AgentService.GetConfigChecksums:output_type -> ChecksumResponse
-	10, // 25: AgentService.SendConfigFile:output_type -> SyncStatus
-	15, // 26: ManagerService.RegisterAgent:output_type -> RegisterAgentResponse
-	17, // 27: ManagerService.UnregisterAgent:output_type -> google.protobuf.Empty
-	13, // 28: ManagerService.Heartbeat:output_type -> HeartbeatResponse
-	17, // [17:29] is the sub-list for method output_type
-	5,  // [5:17] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	18, // 5: Tool.actions:type_name -> ToolAction
+	17, // 6: GetToolsResponse.tools:type_name -> Tool
+	0,  // 7: ToolExecutionStatusResponse.status:type_name -> TaskStatus
+	3,  // 8: AgentService.AssignTask:input_type -> AssignTaskRequest
+	5,  // 9: AgentService.ReportTaskStatus:input_type -> JobStatusRequest
+	24, // 10: AgentService.GetScriptChecksums:input_type -> google.protobuf.Empty
+	9,  // 11: AgentService.SendScriptFile:input_type -> FileContent
+	11, // 12: AgentService.DeleteScriptFile:input_type -> DeleteScriptRequest
+	24, // 13: AgentService.UnregisterAgentAsk:input_type -> google.protobuf.Empty
+	24, // 14: AgentService.TryAgentAddress:input_type -> google.protobuf.Empty
+	24, // 15: AgentService.GetConfigChecksums:input_type -> google.protobuf.Empty
+	9,  // 16: AgentService.SendConfigFile:input_type -> FileContent
+	24, // 17: AgentService.GetTools:input_type -> google.protobuf.Empty
+	20, // 18: AgentService.ExecuteTool:input_type -> ExecuteToolRequest
+	22, // 19: AgentService.ReportToolExecutionStatus:input_type -> ToolExecutionStatusRequest
+	14, // 20: ManagerService.RegisterAgent:input_type -> RegisterAgentRequest
+	16, // 21: ManagerService.UnregisterAgent:input_type -> UnregisterAgentRequest
+	12, // 22: ManagerService.Heartbeat:input_type -> HeartbeatRequest
+	4,  // 23: AgentService.AssignTask:output_type -> AssignTaskResponse
+	6,  // 24: AgentService.ReportTaskStatus:output_type -> JobStatusResponse
+	8,  // 25: AgentService.GetScriptChecksums:output_type -> ChecksumResponse
+	10, // 26: AgentService.SendScriptFile:output_type -> SyncStatus
+	10, // 27: AgentService.DeleteScriptFile:output_type -> SyncStatus
+	24, // 28: AgentService.UnregisterAgentAsk:output_type -> google.protobuf.Empty
+	24, // 29: AgentService.TryAgentAddress:output_type -> google.protobuf.Empty
+	8,  // 30: AgentService.GetConfigChecksums:output_type -> ChecksumResponse
+	10, // 31: AgentService.SendConfigFile:output_type -> SyncStatus
+	19, // 32: AgentService.GetTools:output_type -> GetToolsResponse
+	21, // 33: AgentService.ExecuteTool:output_type -> ExecuteToolResponse
+	23, // 34: AgentService.ReportToolExecutionStatus:output_type -> ToolExecutionStatusResponse
+	15, // 35: ManagerService.RegisterAgent:output_type -> RegisterAgentResponse
+	24, // 36: ManagerService.UnregisterAgent:output_type -> google.protobuf.Empty
+	13, // 37: ManagerService.Heartbeat:output_type -> HeartbeatResponse
+	23, // [23:38] is the sub-list for method output_type
+	8,  // [8:23] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_proto_rpc_proto_init() }
@@ -1074,7 +1524,7 @@ func file_proto_rpc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_rpc_proto_rawDesc), len(file_proto_rpc_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   16,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

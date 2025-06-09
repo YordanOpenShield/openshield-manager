@@ -7,8 +7,8 @@ import (
 	"log"
 	"openshield-manager/internal/db"
 	"openshield-manager/internal/models"
+	"openshield-manager/internal/utils"
 	"openshield-manager/proto"
-	"strings"
 	"time"
 	"unicode/utf8"
 )
@@ -55,7 +55,7 @@ func TrackTaskStatus(agentAddr string, taskID string, jobID string, interval tim
 	for {
 		select {
 		case <-ticker.C:
-			status, result, err := checkStatus(agentAddr, jobID)
+			status, result, err := checkTaskStatus(agentAddr, jobID)
 			if err != nil {
 				errorCount++
 				log.Printf("[TRACKER] Error tracking task %s: %v (attempt %d)", taskID, err, errorCount)
@@ -88,7 +88,7 @@ func TrackTaskStatus(agentAddr string, taskID string, jobID string, interval tim
 	}
 }
 
-func checkStatus(agentAddr, jobID string) (proto.TaskStatus, string, error) {
+func checkTaskStatus(agentAddr, jobID string) (proto.TaskStatus, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -107,18 +107,11 @@ func checkStatus(agentAddr, jobID string) (proto.TaskStatus, string, error) {
 		log.Printf("[TRACKER] Failed to decode base64 result for job %s: %q", jobID, resp.Result)
 		return proto.TaskStatus_FAILED, "", fmt.Errorf("failed to decode base64 result: %w", err)
 	}
-	result := sanitizeString(string(decodedBytes))
+	result := utils.SanitizeString(string(decodedBytes))
 	if !utf8.ValidString(result) {
 		log.Printf("[TRACKER] Invalid UTF-8 in decoded result field for job %s: %q", jobID, result)
 		return proto.TaskStatus_FAILED, "", fmt.Errorf("invalid UTF-8 in decoded result field")
 	}
 
 	return resp.Status, result, nil
-}
-
-func sanitizeString(input string) string {
-	if utf8.ValidString(input) {
-		return input
-	}
-	return strings.ToValidUTF8(input, "�")
 }

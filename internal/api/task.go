@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 	"openshield-manager/internal/db"
-	grpcclient "openshield-manager/internal/grpc"
+	agentgrpc "openshield-manager/internal/grpc"
 	"openshield-manager/internal/models"
 	"openshield-manager/proto"
 	"time"
@@ -50,7 +50,7 @@ func AssignTaskToAgent(c *gin.Context) {
 	}
 
 	// Send task to agent
-	client, err := grpcclient.NewAgentClient(agent.Address)
+	client, err := agentgrpc.NewAgentClient(agent.Address)
 	if err != nil {
 		// Handle the error appropriately, e.g., log or return a response
 		// For now, just log and return
@@ -75,7 +75,7 @@ func AssignTaskToAgent(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, job)
 
-	go grpcclient.TrackTaskStatus(agent.Address, task.ID.String(), job.ID.String(), 1*time.Second)
+	go agentgrpc.TrackTaskStatus(agent.Address, task.ID.String(), job.ID.String(), 1*time.Second)
 
 }
 
