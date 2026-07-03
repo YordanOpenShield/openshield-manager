@@ -1,0 +1,39 @@
+services:
+  manager:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: openshield-manager
+    ports:
+      - "9000:9000"
+      - "50052:50052"
+      - "50053:50053"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./config/docker-config.yml:/etc/openshield/config/config.yml
+      - openshield-scripts:/etc/openshield/scripts
+      - openshield-certs:/etc/openshield/certs
+
+  db:
+    image: postgres:16
+    container_name: openshield-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=openshield
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - openshield-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d openshield"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  openshield-db-data:
+  openshield-scripts:
+  openshield-certs:
