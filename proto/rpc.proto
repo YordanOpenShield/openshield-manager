@@ -154,6 +154,39 @@ service AgentService {
   rpc GetTools(google.protobuf.Empty) returns (GetToolsResponse);
   rpc ExecuteTool(ExecuteToolRequest) returns (ExecuteToolResponse);
   rpc ReportToolExecutionStatus(ToolExecutionStatusRequest) returns (ToolExecutionStatusResponse);
+  
+  // Queries
+  rpc ExecuteQuery(QueryExecutionRequest) returns (QueryExecutionResponse);
+  rpc StreamQueryResults(QueryResultRequest) returns (QueryResultResponse);
+}
+
+// Query messages
+message Query {
+  string id = 1;
+  string name = 2;
+  string sql = 3;
+  string platform = 4;
+}
+
+message QueryExecutionRequest {
+  string execution_id = 1;
+  Query query = 2;
+}
+
+message QueryExecutionResponse {
+  bool accepted = 1;
+  string message = 2;
+}
+
+message QueryResultRequest {
+  string execution_id = 1;
+  string result_json = 2;
+  bool success = 3;
+  string error = 4;
+}
+
+message QueryResultResponse {
+  bool received = 1;
 }
 
 // Service for manager communication
@@ -161,4 +194,8 @@ service ManagerService {
   rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
   rpc UnregisterAgent(UnregisterAgentRequest) returns (google.protobuf.Empty);
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  
+  // Queries
+  rpc SubmitQueryExecution(QueryExecutionRequest) returns (QueryExecutionResponse);
+  rpc ReportQueryResult(QueryResultRequest) returns (QueryResultResponse);
 }

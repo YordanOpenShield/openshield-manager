@@ -49,7 +49,17 @@ func ConnectDatabase() {
 		log.Println("[MANAGER] Connected to PostgreSQL (development)")
 	}
 
-	err = DB.AutoMigrate(&models.Agent{}, &models.AgentAddress{}, &models.AgentService{}, &models.Job{}, &models.Task{}, &models.ToolActionExecution{})
+	err = DB.AutoMigrate(
+		&models.Agent{},
+		&models.AgentAddress{},
+		&models.AgentService{},
+		&models.Job{},
+		&models.Task{},
+		&models.ToolActionExecution{},
+		&models.Query{},
+		&models.QueryExecution{},
+		&models.QueryExecutionResult{},
+	)
 	if err != nil {
 		log.Fatalf("auto-migration failed: %v", err)
 	}

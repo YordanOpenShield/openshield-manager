@@ -39,6 +39,23 @@ func CreateRouter() *gin.Engine {
 		{
 			cert.POST("/sign", SignAgentCSR)
 		}
+		// Queries endpoints - FleetDM-style
+		queries := apiGroup.Group("/queries")
+		{
+			queries.GET("/list", GetQueries)
+			queries.GET("/:id", GetQuery)
+			queries.POST("/create", CreateQuery)
+			queries.PUT("/:id", UpdateQuery)
+			queries.DELETE("/:id", DeleteQuery)
+			queries.POST("/run", RunQuery)
+			queries.POST("/run-live", RunLiveQuery)
+		}
+		// Query executions endpoints
+		executions := apiGroup.Group("/query-executions")
+		{
+			executions.GET("/list", GetQueryExecutions)
+			executions.GET("/:id", GetQueryExecution)
+		}
 	}
 
 	return router
