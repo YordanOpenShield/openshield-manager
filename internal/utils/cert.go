@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"net"
 	"openshield-manager/internal/config"
@@ -124,6 +125,26 @@ func LoadClientTLSCredentials() (*tls.Config, error) {
 	return &tls.Config{
 		Certificates: []tls.Certificate{cert},
 		RootCAs:      caPool,
+		// Skip hostname verification - we verify the cert is signed by our CA
+		// and use agent tokens for identity. This allows agents with dynamic IPs
+		// (VPN, DHCP, etc.) to connect without cert SAN issues.
+		// See: Wazuh's agent verification without host validation approach.
+		InsecureSkipVerify: true,
+		VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			// Only verify that the certificate is signed by our CA
+			// We don't care about the hostname/IP in the cert
+			if len(rawCerts) == 0 {
+				return fmt.Errorf("no certificate provided")
+			}
+			cert, err := x509.ParseCertificate(rawCerts[0])
+			if err != nil {
+				return fmt.Errorf("failed to parse certificate: %w", err)
+			}
+			_, err = cert.Verify(x509.VerifyOptions{
+				Roots: caPool,
+			})
+			return err
+		},
 	}, nil
 
 }
