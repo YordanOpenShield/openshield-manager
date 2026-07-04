@@ -61,7 +61,7 @@ type ExecuteToolRequest struct {
 	AgentID     string   `json:"agent_id" binding:"required"`
 	ToolName    string   `json:"tool_name" binding:"required"`
 	ToolAction  string   `json:"tool_action" binding:"required"`
-	ToolOptions []string `json:"tool_options" binding:"required"`
+	ToolOptions []string `json:"tool_options"` // Optional field
 }
 
 func ExecuteTool(c *gin.Context) {

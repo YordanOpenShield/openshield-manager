@@ -5,6 +5,11 @@ import "github.com/gin-gonic/gin"
 func CreateRouter() *gin.Engine {
 	// Initialize the router
 	router := gin.Default()
+
+	// Serve static web interface files
+	router.Static("/static", "./web")
+	router.StaticFile("/", "./web/index.html")
+
 	// External API routes
 	apiGroup := router.Group("/api")
 	{
