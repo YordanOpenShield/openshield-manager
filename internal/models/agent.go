@@ -29,7 +29,7 @@ type AgentGroup struct {
 	ID          uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	Name        string         `gorm:"not null" json:"name"`
 	Description string         `json:"description"`
-	Tags        []string      `gorm:"type:jsonb;serializer:json" json:"tags"`
+	Tags        []string       `gorm:"type:jsonb;serializer:json" json:"tags"`
 	IsDynamic   bool           `gorm:"default:false" json:"is_dynamic"`
 	Criteria    *AgentCriteria `gorm:"type:jsonb" json:"criteria,omitempty"`
 	CreatedAt   time.Time      `json:"created_at"`
