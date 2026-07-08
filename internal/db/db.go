@@ -53,6 +53,8 @@ func ConnectDatabase() {
 		&models.Agent{},
 		&models.AgentAddress{},
 		&models.AgentService{},
+		&models.AgentGroup{},
+		&models.GroupMembership{},
 		&models.Job{},
 		&models.Task{},
 		&models.ToolActionExecution{},

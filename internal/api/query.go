@@ -85,8 +85,20 @@ func UpdateQuery(c *gin.Context) {
 // DeleteQuery deletes a query
 func DeleteQuery(c *gin.Context) {
 	id := c.Param("id")
+
+	// Find all executions for this query
+	var executions []models.QueryExecution
+	db.DB.Where("query_id = ?", id).Find(&executions)
+
+	for _, exec := range executions {
+		// Delete execution results first
+		db.DB.Where("execution_id = ?", exec.ID).Delete(&models.QueryExecutionResult{})
+		// Then delete the execution
+		db.DB.Where("id = ?", exec.ID).Delete(&models.QueryExecution{})
+	}
+
 	if err := db.DB.Where("id = ?", id).Delete(&models.Query{}).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete query"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete query: " + err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Query deleted successfully"})

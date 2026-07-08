@@ -19,8 +19,6 @@ services:
   db:
     image: postgres:16
     container_name: openshield-db
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_DB=openshield
       - POSTGRES_USER=user
