@@ -17,7 +17,10 @@ import (
 // POST /api/cert/sign
 // TODO: Export this function to the utils package (cert.go)
 type SignAgentCSRRequest struct {
-	SANHosts []string `json:"sanHosts" binding:"required"`
+	// SANHosts is optional. If provided, includes IPs/DNS names in the cert.
+	// Following Wazuh's approach, we verify the cert is signed by our CA,
+	// not that SANs match a specific address, so this field can be empty.
+	SANHosts []string `json:"sanHosts"`
 	CSR      string   `json:"csr" binding:"required"` // PEM as string
 }
 
@@ -36,12 +39,17 @@ func SignAgentCSR(c *gin.Context) {
 		return
 	}
 
-	// Convert SANHosts to IPs and DNS names
-	sanHosts := make([]net.IP, 0, len(req.SANHosts))
+	// Parse SANs - both IPs and DNS names are optional
+	// Following Wazuh's approach: we verify the cert is signed by our CA,
+	// not that the SANs match a specific IP/hostname. This allows agents
+	// with dynamic IPs (VPN, DHCP) to work without cert regeneration.
+	var ipAddresses []net.IP
+	var dnsNames []string
 	for _, addr := range req.SANHosts {
-		ip := net.ParseIP(addr)
-		if ip != nil {
-			sanHosts = append(sanHosts, ip)
+		if ip := net.ParseIP(addr); ip != nil {
+			ipAddresses = append(ipAddresses, ip)
+		} else {
+			dnsNames = append(dnsNames, addr)
 		}
 	}
 
@@ -77,7 +85,8 @@ func SignAgentCSR(c *gin.Context) {
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
-		IPAddresses:           sanHosts, // Add IP SANs here
+		IPAddresses:           ipAddresses,
+		DNSNames:              dnsNames,
 	}
 
 	certDER, err := x509.CreateCertificate(

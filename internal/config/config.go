@@ -14,11 +14,11 @@ var CertsPath string = "certs"
 func init() {
 	switch runtime.GOOS {
 	case "windows":
-		ConfigPath = "C:\\ProgramData\\openshield\\config.yml"
+		ConfigPath = "C:\\ProgramData\\openshield\\config"
 		ScriptsPath = "C:\\ProgramData\\openshield\\scripts"
 		CertsPath = "C:\\ProgramData\\openshield\\certs"
 	default:
-		ConfigPath = "/etc/openshield/config.yml"
+		ConfigPath = "/etc/openshield/config"
 		ScriptsPath = "/etc/openshield/scripts"
 		CertsPath = "/etc/openshield/certs"
 	}

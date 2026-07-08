@@ -20,7 +20,10 @@ func CreateCertificates() error {
 
 	// Get all possible addresses for the manager
 	addresses, err := utils.GetAllLocalAddresses()
-	ips := make([]net.IP, 0, len(addresses))
+	ips := make([]net.IP, 0, len(addresses)+2)
+	// Always include localhost for host-based agents
+	ips = append(ips, net.ParseIP("127.0.0.1"))
+	ips = append(ips, net.ParseIP("::1"))
 	for _, addr := range addresses {
 		ip := net.ParseIP(addr)
 		if ip != nil {
