@@ -5,16 +5,33 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
+
 	"openshield-manager/internal/db"
 	"openshield-manager/internal/models"
 	"openshield-manager/proto"
-	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *ManagerRegistrationServer) RegisterAgent(ctx context.Context, req *proto.RegisterAgentRequest) (*proto.RegisterAgentResponse, error) {
+	// Validate the registration token (if provided) and get the organization ID
+	var orgID *uuid.UUID
+	if req.RegistrationToken != "" {
+		var err error
+		orgID, err = ValidateRegistrationToken(req.RegistrationToken)
+		if err != nil {
+			log.Printf("[REGISTER] Invalid registration token: %v", err)
+			return nil, status.Errorf(codes.InvalidArgument, "invalid registration token: %v", err)
+		}
+		log.Printf("[REGISTER] Agent registering with org ID: %s", orgID)
+	} else {
+		log.Printf("[REGISTER] Agent registering without registration token (no org assignment)")
+	}
+
 	// Create a new agent
 	agentID := uuid.New()
 	agent := models.Agent{
@@ -25,12 +42,17 @@ func (s *ManagerRegistrationServer) RegisterAgent(ctx context.Context, req *prot
 		State:    "DISCONNECTED",
 	}
 
+	// Assign organization if token was provided
+	if orgID != nil {
+		agent.OrganizationID = orgID
+	}
+
 	if err := db.DB.Create(&agent).Error; err != nil {
 		log.Printf("[REGISTER] Failed to create agent: %v", err)
 		return nil, err
 	}
 
-	log.Printf("[REGISTER] New agent registered with ID: %s", agentID)
+	log.Printf("[REGISTER] New agent registered with ID: %s (org: %v)", agentID, orgID)
 
 	return &proto.RegisterAgentResponse{
 		Id:    agentID.String(),

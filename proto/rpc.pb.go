@@ -775,10 +775,11 @@ func (x *HeartbeatResponse) GetOk() bool {
 }
 
 type RegisterAgentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DeviceId      string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId          string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	RegistrationToken string                 `protobuf:"bytes,2,opt,name=registration_token,json=registrationToken,proto3" json:"registration_token,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *RegisterAgentRequest) Reset() {
@@ -814,6 +815,13 @@ func (*RegisterAgentRequest) Descriptor() ([]byte, []int) {
 func (x *RegisterAgentRequest) GetDeviceId() string {
 	if x != nil {
 		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *RegisterAgentRequest) GetRegistrationToken() string {
+	if x != nil {
+		return x.RegistrationToken
 	}
 	return ""
 }
@@ -1650,9 +1658,10 @@ const file_proto_rpc_proto_rawDesc = "" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"#\n" +
 	"\x11HeartbeatResponse\x12\x0e\n" +
-	"\x02ok\x18\x01 \x01(\bR\x02ok\"3\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok\"b\n" +
 	"\x14RegisterAgentRequest\x12\x1b\n" +
-	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\"=\n" +
+	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\x12-\n" +
+	"\x12registration_token\x18\x02 \x01(\tR\x11registrationToken\"=\n" +
 	"\x15RegisterAgentResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\"(\n" +

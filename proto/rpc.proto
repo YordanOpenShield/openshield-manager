@@ -80,6 +80,7 @@ message HeartbeatResponse {
 
 message RegisterAgentRequest {
   string device_id = 1;
+  string registration_token = 2;
 }
 
 message RegisterAgentResponse {
