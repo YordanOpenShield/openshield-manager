@@ -168,3 +168,17 @@ func LoadServerTLSCredentials() (*tls.Config, error) {
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 	}, nil
 }
+
+// LoadRESTTLSCredentials loads server-side TLS credentials for the REST API (Gin).
+// Unlike the gRPC mTLS config, this does NOT require client certificates,
+// so browsers and the dashboard can connect without installing a client cert.
+func LoadRESTTLSCredentials() (*tls.Config, error) {
+	cert, err := tls.LoadX509KeyPair(config.CertsPath+"/manager.crt", config.CertsPath+"/manager.key")
+	if err != nil {
+		return nil, err
+	}
+	return &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		MinVersion:   tls.VersionTLS12,
+	}, nil
+}

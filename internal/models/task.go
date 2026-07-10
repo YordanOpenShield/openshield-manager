@@ -17,13 +17,14 @@ const (
 )
 
 type Task struct {
-	ID        uuid.UUID  `gorm:"primaryKey;type:uuid" json:"id"`
-	JobID     uuid.UUID  `gorm:"not null" json:"job_id"`
-	AgentID   uuid.UUID  `gorm:"not null" json:"agent_id"`
-	Status    TaskStatus `gorm:"default:'PENDING'" json:"status"`
-	Result    string     `gorm:"type:text" json:"result"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID             uuid.UUID  `gorm:"primaryKey;type:uuid" json:"id"`
+	OrganizationID *uuid.UUID `gorm:"type:uuid;index" json:"organization_id,omitempty"`
+	JobID          uuid.UUID  `gorm:"not null" json:"job_id"`
+	AgentID        uuid.UUID  `gorm:"not null" json:"agent_id"`
+	Status         TaskStatus `gorm:"default:'PENDING'" json:"status"`
+	Result         string     `gorm:"type:text" json:"result"`
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
 }
 
 func (t *Task) BeforeCreate(tx *gorm.DB) (err error) {

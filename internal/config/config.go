@@ -34,6 +34,9 @@ type Config struct {
 	DB_PASSWORD string `yaml:"DB_PASSWORD"`
 	DB_NAME     string `yaml:"DB_NAME"`
 	DB_SSLMODE  string `yaml:"DB_SSLMODE"`
+	HTTP_PORT   string `yaml:"HTTP_PORT"`
+	TLS_ENABLED bool   `yaml:"TLS_ENABLED"`
+	JWT_SECRET  string `yaml:"JWT_SECRET"`
 }
 
 func GenerateConfig(opts Config) *Config {
@@ -85,6 +88,21 @@ func GenerateConfig(opts Config) *Config {
 				return opts.DB_SSLMODE
 			} else {
 				return "disable"
+			}
+		}(),
+		HTTP_PORT: func() string {
+			if opts.HTTP_PORT != "" {
+				return opts.HTTP_PORT
+			} else {
+				return "9000"
+			}
+		}(),
+		TLS_ENABLED: opts.TLS_ENABLED,
+		JWT_SECRET: func() string {
+			if opts.JWT_SECRET != "" {
+				return opts.JWT_SECRET
+			} else {
+				return "change-me-in-production"
 			}
 		}(),
 	}

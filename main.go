@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net/http"
 	"openshield-manager/internal/api"
 	"openshield-manager/internal/config"
 	"openshield-manager/internal/db"
@@ -38,6 +39,11 @@ func main() {
 	// Initialize the database connection
 	db.ConnectDatabase()
 
+	// Seed default organization and super admin if first run
+	if err := service.SeedDefaultOrg(); err != nil {
+		log.Printf("[MANAGER] Warning: seed failed (may already be seeded): %v", err)
+	}
+
 	// Generate manager certificates
 	err = service.CreateCertificates()
 	if err != nil {
@@ -68,7 +74,25 @@ func main() {
 	stopAgentMonitor := make(chan struct{})
 	service.AgentLastSeenMonitor(30*time.Second, stopAgentMonitor)
 
-	// Start the API router
+	// Start the API router (with optional TLS)
 	router := api.CreateRouter()
-	router.Run(":9000")
+	addr := ":" + config.GlobalConfig.HTTP_PORT
+	if config.GlobalConfig.TLS_ENABLED {
+		tlsConfig, err := utils.LoadRESTTLSCredentials()
+		if err != nil {
+			log.Fatalf("Failed to load REST TLS credentials: %v", err)
+		}
+		server := &http.Server{
+			Addr:      addr,
+			Handler:   router,
+			TLSConfig: tlsConfig,
+		}
+		log.Printf("[MANAGER] REST API listening on %s (TLS enabled)", addr)
+		if err := server.ListenAndServeTLS(config.CertsPath+"/manager.crt", config.CertsPath+"/manager.key"); err != nil {
+			log.Fatalf("Failed to start HTTPS server: %v", err)
+		}
+	} else {
+		log.Printf("[MANAGER] REST API listening on %s (no TLS)", addr)
+		router.Run(addr)
+	}
 }

@@ -50,6 +50,10 @@ func ConnectDatabase() {
 	}
 
 	err = DB.AutoMigrate(
+		&models.Organization{},
+		&models.User{},
+		&models.ApiKey{},
+		&models.RegistrationToken{},
 		&models.Agent{},
 		&models.AgentAddress{},
 		&models.AgentService{},
@@ -61,6 +65,7 @@ func ConnectDatabase() {
 		&models.Query{},
 		&models.QueryExecution{},
 		&models.QueryExecutionResult{},
+		&models.BulkOperation{},
 	)
 	if err != nil {
 		log.Fatalf("auto-migration failed: %v", err)
