@@ -92,7 +92,7 @@ func CancelBulkOperation(c *gin.Context) {
 // processBulkOperation handles the actual bulk processing
 func processBulkOperation(opID uuid.UUID, orgID *uuid.UUID) {
 	var op models.BulkOperation
-	if err := db.DB.Where("id = ?", opID).First(&op).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", opID).First(&op).Error; err != nil {
 		return
 	}
 

@@ -39,10 +39,15 @@ func CreateRegistrationToken(orgID uuid.UUID, maxUses int, expiresIn *time.Durat
 	return &token, nil
 }
 
-// ListRegistrationTokens returns all registration tokens.
-func ListRegistrationTokens() ([]models.RegistrationToken, error) {
+// ListRegistrationTokens returns registration tokens, optionally scoped to an org.
+// Pass nil orgID for super admins (returns all), or a specific orgID for org-scoped listing.
+func ListRegistrationTokens(orgID *uuid.UUID) ([]models.RegistrationToken, error) {
 	var tokens []models.RegistrationToken
-	if err := db.DB.Preload("Organization").Order("created_at DESC").Find(&tokens).Error; err != nil {
+	query := db.DB.Preload("Organization").Order("created_at DESC")
+	if orgID != nil {
+		query = query.Where("organization_id = ?", *orgID)
+	}
+	if err := query.Find(&tokens).Error; err != nil {
 		return nil, err
 	}
 	return tokens, nil

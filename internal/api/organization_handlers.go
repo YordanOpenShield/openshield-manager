@@ -7,7 +7,9 @@ import (
 	"github.com/google/uuid"
 
 	"openshield-manager/internal/middleware"
+	"openshield-manager/internal/models"
 	"openshield-manager/internal/service"
+	"openshield-manager/internal/utils"
 )
 
 // ListOrganizations handles GET /api/organizations
@@ -23,12 +25,22 @@ func ListOrganizations(c *gin.Context) {
 	})
 }
 
-// GetOrganization handles GET /api/organizations/:id
+// GetOrganization handles GET /api/organizations/:id, scoped to the caller's org.
 func GetOrganization(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid organization ID"})
 		return
+	}
+
+	// Enforce org scoping: non-super-admins can only view their own org
+	callerOrgID, _ := utils.GetOrgID(c)
+	callerRole, _ := utils.GetUserRole(c)
+	if callerRole != models.UserRoleSuperAdmin {
+		if callerOrgID == nil || *callerOrgID != id {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Organization not found"})
+			return
+		}
 	}
 
 	org, err := service.GetOrganizationByID(id)
@@ -120,7 +132,7 @@ func DeleteOrganization(c *gin.Context) {
 func RegisterOrgRoutes(apiGroup *gin.RouterGroup) {
 	orgs := apiGroup.Group("/organizations")
 	{
-		orgs.GET("", middleware.AuthMiddleware(), middleware.RequireRole(middleware.RoleAdmin), ListOrganizations)
+		orgs.GET("", middleware.AuthMiddleware(), middleware.RequireRole(middleware.RoleSuperAdmin), ListOrganizations)
 		orgs.GET("/:id", middleware.AuthMiddleware(), middleware.RequireRole(middleware.RoleAdmin), GetOrganization)
 		orgs.POST("", middleware.AuthMiddleware(), middleware.RequireRole(middleware.RoleSuperAdmin), CreateOrganization)
 		orgs.PUT("/:id", middleware.AuthMiddleware(), middleware.RequireRole(middleware.RoleSuperAdmin), UpdateOrganization)

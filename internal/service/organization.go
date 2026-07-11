@@ -93,8 +93,54 @@ func UpdateOrganization(id uuid.UUID, name, slug string) (*models.Organization, 
 	return org, nil
 }
 
-// DeleteOrganization removes an organization by ID.
+// DeleteOrganization removes an organization by ID with cascading cleanup.
 func DeleteOrganization(id uuid.UUID) error {
+	// Cascade delete all resources belonging to this org
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.AgentAddress{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.AgentService{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.GroupMembership{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.AgentGroup{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.ToolActionExecution{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.QueryExecutionResult{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.QueryExecution{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.Query{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.Task{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.Job{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.BulkOperation{}).Error; err != nil {
+		return err
+	}
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.Agent{}).Error; err != nil {
+		return err
+	}
+	// Delete registration tokens (which have non-nullable org FK)
+	if err := db.DB.Where("organization_id = ?", id).Delete(&models.RegistrationToken{}).Error; err != nil {
+		return err
+	}
+	// Unset org on users (set to NULL rather than deleting users)
+	if err := db.DB.Model(&models.User{}).Where("organization_id = ?", id).Update("organization_id", nil).Error; err != nil {
+		return err
+	}
+	// Finally delete the organization
 	result := db.DB.Delete(&models.Organization{}, "id = ?", id)
 	if result.RowsAffected == 0 {
 		return ErrOrgNotFound

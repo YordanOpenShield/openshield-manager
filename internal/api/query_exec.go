@@ -102,10 +102,11 @@ func RunLiveQuery(c *gin.Context) {
 
 	// Create a temporary query (saved to DB for FK constraint)
 	query := models.Query{
-		ID:       uuid.New(),
-		Name:     "Live Query",
-		SQL:      req.SQL,
-		Platform: req.Platform,
+		ID:             uuid.New(),
+		Name:           "Live Query",
+		SQL:            req.SQL,
+		Platform:       req.Platform,
+		OrganizationID: orgID,
 	}
 	if err := db.DB.Create(&query).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create query"})

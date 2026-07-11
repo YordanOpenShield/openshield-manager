@@ -8,11 +8,13 @@ import (
 	"github.com/google/uuid"
 
 	"openshield-manager/internal/middleware"
+	"openshield-manager/internal/models"
 	"openshield-manager/internal/service"
 	"openshield-manager/internal/utils"
 )
 
 // CreateRegistrationToken handles POST /api/registration-tokens
+// Org admins can only create tokens for their own org.
 func CreateRegistrationToken(c *gin.Context) {
 	var req struct {
 		OrganizationID string `json:"organization_id" binding:"required"`
@@ -28,6 +30,14 @@ func CreateRegistrationToken(c *gin.Context) {
 	orgID, err := uuid.Parse(req.OrganizationID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid organization ID"})
+		return
+	}
+
+	// Enforce org ownership: org_admin must create tokens for their own org
+	callerOrgID, _ := utils.GetOrgID(c)
+	callerRole, _ := utils.GetUserRole(c)
+	if callerRole != models.UserRoleSuperAdmin && callerOrgID != nil && *callerOrgID != orgID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Cannot create registration token for a different organization"})
 		return
 	}
 
@@ -60,9 +70,10 @@ func CreateRegistrationToken(c *gin.Context) {
 	})
 }
 
-// ListRegistrationTokens handles GET /api/registration-tokens
+// ListRegistrationTokens handles GET /api/registration-tokens, scoped to the caller's org.
 func ListRegistrationTokens(c *gin.Context) {
-	tokens, err := service.ListRegistrationTokens()
+	orgID, _ := utils.GetOrgID(c)
+	tokens, err := service.ListRegistrationTokens(orgID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to list tokens"})
 		return
@@ -74,7 +85,7 @@ func ListRegistrationTokens(c *gin.Context) {
 	})
 }
 
-// GetRegistrationToken handles GET /api/registration-tokens/:id
+// GetRegistrationToken handles GET /api/registration-tokens/:id, scoped to the caller's org.
 func GetRegistrationToken(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
@@ -88,18 +99,44 @@ func GetRegistrationToken(c *gin.Context) {
 		return
 	}
 
+	// Enforce org scoping: non-super-admins can only see their org's tokens
+	callerOrgID, _ := utils.GetOrgID(c)
+	callerRole, _ := utils.GetUserRole(c)
+	if callerRole != models.UserRoleSuperAdmin && token.OrganizationID != uuid.Nil {
+		if callerOrgID == nil || *callerOrgID != token.OrganizationID {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Registration token not found"})
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"data":  token,
 		"error": 0,
 	})
 }
 
-// RevokeRegistrationToken handles DELETE /api/registration-tokens/:id
+// RevokeRegistrationToken handles DELETE /api/registration-tokens/:id, scoped to the caller's org.
 func RevokeRegistrationToken(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token ID"})
 		return
+	}
+
+	// First load the token to verify org ownership
+	token, err := service.GetRegistrationTokenByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Registration token not found"})
+		return
+	}
+
+	callerOrgID, _ := utils.GetOrgID(c)
+	callerRole, _ := utils.GetUserRole(c)
+	if callerRole != models.UserRoleSuperAdmin && token.OrganizationID != uuid.Nil {
+		if callerOrgID == nil || *callerOrgID != token.OrganizationID {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Registration token not found"})
+			return
+		}
 	}
 
 	if err := service.RevokeRegistrationToken(id); err != nil {

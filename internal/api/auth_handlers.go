@@ -9,6 +9,7 @@ import (
 	"openshield-manager/internal/middleware"
 	"openshield-manager/internal/models"
 	"openshield-manager/internal/service"
+	"openshield-manager/internal/utils"
 )
 
 // Authenticate handles POST /api/auth/authenticate (Basic Auth login).
@@ -42,6 +43,7 @@ func Logout(c *gin.Context) {
 }
 
 // RegisterUser handles POST /api/auth/register (create a new user).
+// Org admins can only create users within their own org.
 func RegisterUser(c *gin.Context) {
 	var req struct {
 		Email    string          `json:"email" binding:"required"`
@@ -61,15 +63,24 @@ func RegisterUser(c *gin.Context) {
 		req.Role = models.UserRoleOrgViewer
 	}
 
-	// Parse organization_id from request (optional)
+	callerOrgID, _ := utils.GetOrgID(c)
+	callerRole, _ := utils.GetUserRole(c)
+
+	// Enforce org ownership: org_admin can only create users in their own org
 	var orgID *uuid.UUID
-	if req.OrgID != nil && *req.OrgID != "" {
-		parsed, err := uuid.Parse(*req.OrgID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid organization_id format"})
-			return
+	if callerRole == models.UserRoleSuperAdmin {
+		// Super admin can specify any org (or none for cross-org users)
+		if req.OrgID != nil && *req.OrgID != "" {
+			parsed, err := uuid.Parse(*req.OrgID)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid organization_id format"})
+				return
+			}
+			orgID = &parsed
 		}
-		orgID = &parsed
+	} else {
+		// Org admin: force to their own org, ignore request body
+		orgID = callerOrgID
 	}
 
 	user, err := service.RegisterUser(req.Email, req.Password, req.Name, req.Role, orgID)

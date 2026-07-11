@@ -184,8 +184,10 @@ func TryAgentAddresses(agentID string) (*models.AgentAddress, error) {
 		return nil, fmt.Errorf("agent not found: %w", err)
 	}
 
+	orgID := agent.OrganizationID
+
 	var addresses []models.AgentAddress
-	if err := db.DB.Where("agent_id = ?", agentID).Find(&addresses).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("agent_id = ?", agentID).Find(&addresses).Error; err != nil {
 		return nil, fmt.Errorf("failed to get agent addresses: %w", err)
 	}
 
