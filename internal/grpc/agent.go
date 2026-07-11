@@ -17,19 +17,36 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+// getDefaultOrgID returns the ID of the default organization (slug: "default").
+func getDefaultOrgID() *uuid.UUID {
+	var org models.Organization
+	if err := db.DB.Where("slug = ?", "default").First(&org).Error; err != nil {
+		log.Printf("[REGISTER] Default organization not found: %v", err)
+		return nil
+	}
+	return &org.ID
+}
+
 func (s *ManagerRegistrationServer) RegisterAgent(ctx context.Context, req *proto.RegisterAgentRequest) (*proto.RegisterAgentResponse, error) {
-	// Validate the registration token (if provided) and get the organization ID
+	// Determine the organization ID for this agent
 	var orgID *uuid.UUID
 	if req.RegistrationToken != "" {
+		// Validate the registration token and get the associated org
 		var err error
 		orgID, err = ValidateRegistrationToken(req.RegistrationToken)
 		if err != nil {
 			log.Printf("[REGISTER] Invalid registration token: %v", err)
 			return nil, status.Errorf(codes.InvalidArgument, "invalid registration token: %v", err)
 		}
-		log.Printf("[REGISTER] Agent registering with org ID: %s", orgID)
+		log.Printf("[REGISTER] Agent registering with org ID: %s (from token)", orgID)
 	} else {
-		log.Printf("[REGISTER] Agent registering without registration token (no org assignment)")
+		// No token provided — auto-assign to the default organization
+		orgID = getDefaultOrgID()
+		if orgID != nil {
+			log.Printf("[REGISTER] Agent registering with org ID: %s (default)", orgID)
+		} else {
+			log.Printf("[REGISTER] Agent registering without organization (no default org found)")
+		}
 	}
 
 	// Create a new agent
@@ -42,7 +59,6 @@ func (s *ManagerRegistrationServer) RegisterAgent(ctx context.Context, req *prot
 		State:    "DISCONNECTED",
 	}
 
-	// Assign organization if token was provided
 	if orgID != nil {
 		agent.OrganizationID = orgID
 	}
@@ -69,12 +85,21 @@ func (s *ManagerServer) UnregisterAgent(ctx context.Context, req *proto.Unregist
 	agentID := req.Id
 	log.Printf("[UNREGISTER] Unregistering agent with ID: %s", agentID)
 
-	// Delete agent and its addresses
-	if err := db.DB.Where("agent_id = ?", agentID).Delete(&models.AgentAddress{}).Error; err != nil {
+	// Load agent with org info for scoped deletion
+	var agent models.Agent
+	if err := db.DB.Where("id = ?", agentID).First(&agent).Error; err != nil {
+		log.Printf("[UNREGISTER] Agent not found: %s", agentID)
+		return nil, err
+	}
+
+	orgID := agent.OrganizationID
+
+	// Delete agent and its addresses (scoped to org for defense-in-depth)
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("agent_id = ?", agentID).Delete(&models.AgentAddress{}).Error; err != nil {
 		log.Printf("[UNREGISTER] Failed to delete agent addresses: %v", err)
 		return nil, err
 	}
-	if err := db.DB.Where("id = ?", agentID).Delete(&models.Agent{}).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", agentID).Delete(&models.Agent{}).Error; err != nil {
 		log.Printf("[UNREGISTER] Failed to delete agent: %v", err)
 		return nil, err
 	}
@@ -112,8 +137,9 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 	// Save new addresses from the request
 	for _, addr := range message.Addresses {
 		address := models.AgentAddress{
-			AgentID: agent.ID,
-			Address: addr,
+			AgentID:        agent.ID,
+			Address:        addr,
+			OrganizationID: agent.OrganizationID,
 		}
 		if err := db.DB.Create(&address).Error; err != nil {
 			log.Printf("Failed to save agent address: %v", err)
@@ -123,6 +149,7 @@ func (s *ManagerServer) Heartbeat(ctx context.Context, req *proto.HeartbeatReque
 
 	for _, service := range message.Services {
 		service.AgentID = agent.ID
+		service.OrganizationID = agent.OrganizationID
 		service.CreatedAt = time.Now()
 		service.UpdatedAt = time.Now()
 		if err := db.DB.Save(&service).Error; err != nil {

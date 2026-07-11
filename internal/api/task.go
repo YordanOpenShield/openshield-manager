@@ -5,6 +5,7 @@ import (
 	"openshield-manager/internal/db"
 	agentgrpc "openshield-manager/internal/grpc"
 	"openshield-manager/internal/models"
+	"openshield-manager/internal/utils"
 	"openshield-manager/proto"
 	"time"
 
@@ -24,25 +25,28 @@ func AssignTaskToAgent(c *gin.Context) {
 		return
 	}
 
+	orgID, _ := utils.GetOrgID(c)
+
 	// Check if the agent exists
 	var agent models.Agent
-	if err := db.DB.Where("id = ?", req.AgentID).First(&agent).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", req.AgentID).First(&agent).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
 		return
 	}
 
 	// Check if the job exists
 	var job models.Job
-	if err := db.DB.Where("id = ?", req.JobID).First(&job).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", req.JobID).First(&job).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
 		return
 	}
 
 	// Store task in DB
 	task := models.Task{
-		ID:      uuid.New(),
-		JobID:   job.ID,
-		AgentID: agent.ID,
+		ID:             uuid.New(),
+		JobID:          job.ID,
+		AgentID:        agent.ID,
+		OrganizationID: orgID,
 	}
 	if err := db.DB.Create(&task).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create task: " + err.Error()})
@@ -79,30 +83,32 @@ func AssignTaskToAgent(c *gin.Context) {
 
 }
 
-// GetTasksByAgent returns all tasks for a given agent ID
+// GetTasksByAgent returns all tasks for a given agent ID, scoped to the user's organization
 func GetTasksByAgent(c *gin.Context) {
 	agentID := c.Param("id")
+	orgID, _ := utils.GetOrgID(c)
 
 	// Check if the agent exists
 	var agent models.Agent
-	if err := db.DB.Where("id = ?", agentID).First(&agent).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", agentID).First(&agent).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
 		return
 	}
 
 	// Fetch tasks for the agent
 	var tasks []models.Task
-	if err := db.DB.Where("agent_id = ?", agentID).Find(&tasks).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("agent_id = ?", agentID).Find(&tasks).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch tasks for agent: " + err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, tasks)
 }
 
-// GetAllTasks returns all tasks in the system
+// GetAllTasks returns all tasks scoped to the user's organization
 func GetAllTasks(c *gin.Context) {
+	orgID, _ := utils.GetOrgID(c)
 	var tasks []models.Task
-	if err := db.DB.Find(&tasks).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Find(&tasks).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch tasks: " + err.Error()})
 		return
 	}

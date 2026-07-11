@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"openshield-manager/internal/config"
 	"openshield-manager/internal/db"
 	"openshield-manager/internal/models"
 )
@@ -115,11 +116,25 @@ func SeedDefaultOrg() error {
 		return err
 	}
 	if err == nil {
+		// Use config values with sensible defaults
+		email := config.GlobalConfig.ADMIN_EMAIL
+		if email == "" {
+			email = "admin@openshield.local"
+		}
+		password := config.GlobalConfig.ADMIN_PASSWORD
+		if password == "" {
+			password = "admin"
+		}
+		name := config.GlobalConfig.ADMIN_NAME
+		if name == "" {
+			name = "Super Admin"
+		}
+
 		// Create super admin user
 		_, err = RegisterUser(
-			"admin@openshield.local",
-			"admin",
-			"Super Admin",
+			email,
+			password,
+			name,
 			models.UserRoleSuperAdmin,
 			nil, // no org for super admin
 		)

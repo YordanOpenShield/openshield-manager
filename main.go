@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net"
 	"net/http"
 	"openshield-manager/internal/api"
 	"openshield-manager/internal/config"
@@ -74,25 +75,49 @@ func main() {
 	stopAgentMonitor := make(chan struct{})
 	service.AgentLastSeenMonitor(30*time.Second, stopAgentMonitor)
 
-	// Start the API router (with optional TLS)
+	// Start the API router
 	router := api.CreateRouter()
-	addr := ":" + config.GlobalConfig.HTTP_PORT
+	httpAddr := ":" + config.GlobalConfig.HTTP_PORT
+
 	if config.GlobalConfig.TLS_ENABLED {
+		// HTTPS server on the configured HTTPS port
+		httpsAddr := ":" + config.GlobalConfig.HTTPS_PORT
 		tlsConfig, err := utils.LoadRESTTLSCredentials()
 		if err != nil {
 			log.Fatalf("Failed to load REST TLS credentials: %v", err)
 		}
-		server := &http.Server{
-			Addr:      addr,
+		httpsServer := &http.Server{
+			Addr:      httpsAddr,
 			Handler:   router,
 			TLSConfig: tlsConfig,
 		}
-		log.Printf("[MANAGER] REST API listening on %s (TLS enabled)", addr)
-		if err := server.ListenAndServeTLS(config.CertsPath+"/manager.crt", config.CertsPath+"/manager.key"); err != nil {
-			log.Fatalf("Failed to start HTTPS server: %v", err)
+
+		go func() {
+			log.Printf("[MANAGER] REST API listening on %s (TLS enabled)", httpsAddr)
+			if err := httpsServer.ListenAndServeTLS(config.CertsPath+"/manager.crt", config.CertsPath+"/manager.key"); err != nil {
+				log.Fatalf("Failed to start HTTPS server: %v", err)
+			}
+		}()
+
+		// HTTP server on port 9000: redirects all traffic to HTTPS
+		httpServer := &http.Server{
+			Addr: httpAddr,
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				host := r.Host
+				// Replace the port if present
+				if _, _, err := net.SplitHostPort(host); err == nil {
+					host, _, _ = net.SplitHostPort(host)
+				}
+				redirectURL := "https://" + host + ":" + config.GlobalConfig.HTTPS_PORT + r.URL.RequestURI()
+				http.Redirect(w, r, redirectURL, http.StatusTemporaryRedirect)
+			}),
+		}
+		log.Printf("[MANAGER] HTTP redirect on %s → HTTPS%s", httpAddr, httpsAddr)
+		if err := httpServer.ListenAndServe(); err != nil {
+			log.Fatalf("Failed to start HTTP redirect server: %v", err)
 		}
 	} else {
-		log.Printf("[MANAGER] REST API listening on %s (no TLS)", addr)
-		router.Run(addr)
+		log.Printf("[MANAGER] REST API listening on %s (no TLS)", httpAddr)
+		router.Run(httpAddr)
 	}
 }

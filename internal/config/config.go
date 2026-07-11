@@ -27,16 +27,20 @@ func init() {
 var GlobalConfig Config
 
 type Config struct {
-	ENVIRONMENT string `yaml:"ENVIRONMENT"`
-	DB_HOST     string `yaml:"DB_HOST"`
-	DB_PORT     string `yaml:"DB_PORT"`
-	DB_USER     string `yaml:"DB_USER"`
-	DB_PASSWORD string `yaml:"DB_PASSWORD"`
-	DB_NAME     string `yaml:"DB_NAME"`
-	DB_SSLMODE  string `yaml:"DB_SSLMODE"`
-	HTTP_PORT   string `yaml:"HTTP_PORT"`
-	TLS_ENABLED bool   `yaml:"TLS_ENABLED"`
-	JWT_SECRET  string `yaml:"JWT_SECRET"`
+	ENVIRONMENT    string `yaml:"ENVIRONMENT"`
+	DB_HOST        string `yaml:"DB_HOST"`
+	DB_PORT        string `yaml:"DB_PORT"`
+	DB_USER        string `yaml:"DB_USER"`
+	DB_PASSWORD    string `yaml:"DB_PASSWORD"`
+	DB_NAME        string `yaml:"DB_NAME"`
+	DB_SSLMODE     string `yaml:"DB_SSLMODE"`
+	HTTP_PORT      string `yaml:"HTTP_PORT"`
+	HTTPS_PORT     string `yaml:"HTTPS_PORT"`
+	TLS_ENABLED    bool   `yaml:"TLS_ENABLED"`
+	JWT_SECRET     string `yaml:"JWT_SECRET"`
+	ADMIN_EMAIL    string `yaml:"ADMIN_EMAIL"`
+	ADMIN_PASSWORD string `yaml:"ADMIN_PASSWORD"`
+	ADMIN_NAME     string `yaml:"ADMIN_NAME"`
 }
 
 func GenerateConfig(opts Config) *Config {

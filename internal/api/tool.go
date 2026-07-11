@@ -6,18 +6,20 @@ import (
 	"openshield-manager/internal/db"
 	agentgrpc "openshield-manager/internal/grpc"
 	"openshield-manager/internal/models"
+	"openshield-manager/internal/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// GetToolsByAgent returns all tools for a given agentID.
+// GetToolsByAgent returns all tools for a given agentID, scoped to the user's organization.
 func GetToolsByAgent(c *gin.Context) {
 	agentID := c.Param("id")
+	orgID, _ := utils.GetOrgID(c)
 
 	// Check if the agent exists
 	var agent models.Agent
-	if err := db.DB.Where("id = ?", agentID).First(&agent).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", agentID).First(&agent).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
 		return
 	}
@@ -71,9 +73,11 @@ func ExecuteTool(c *gin.Context) {
 		return
 	}
 
+	orgID, _ := utils.GetOrgID(c)
+
 	// Check if the agent exists
 	var agent models.Agent
-	if err := db.DB.Where("id = ?", req.AgentID).First(&agent).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", req.AgentID).First(&agent).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Agent not found"})
 		return
 	}
@@ -95,10 +99,11 @@ func ExecuteTool(c *gin.Context) {
 
 	// Track the tool action status
 	toolActionExecution := models.ToolActionExecution{
-		AgentID:     agent.ID,
-		ToolName:    req.ToolName,
-		ToolAction:  req.ToolAction,
-		ToolOptions: req.ToolOptions,
+		AgentID:        agent.ID,
+		ToolName:       req.ToolName,
+		ToolAction:     req.ToolAction,
+		ToolOptions:    req.ToolOptions,
+		OrganizationID: orgID,
 	}
 	if err := db.DB.Create(&toolActionExecution).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create tool action execution: " + err.Error()})

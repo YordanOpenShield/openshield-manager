@@ -5,6 +5,7 @@ import (
 	"openshield-manager/internal/db"
 	managergrpc "openshield-manager/internal/grpc"
 	"openshield-manager/internal/models"
+	"openshield-manager/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -16,7 +17,7 @@ type RunQueryRequest struct {
 	AgentIDs []string `json:"agent_ids"` // empty means all online agents
 }
 
-// RunQuery executes a query on specified agents
+// RunQuery executes a query on specified agents, scoped to the user's organization
 func RunQuery(c *gin.Context) {
 	var req RunQueryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -24,18 +25,21 @@ func RunQuery(c *gin.Context) {
 		return
 	}
 
+	orgID, _ := utils.GetOrgID(c)
+
 	// Get the query
 	var query models.Query
-	if err := db.DB.Where("id = ?", req.QueryID).First(&query).Error; err != nil {
+	if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id = ?", req.QueryID).First(&query).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Query not found"})
 		return
 	}
 
 	// Create execution record
 	execution := models.QueryExecution{
-		ID:      uuid.New(),
-		QueryID: query.ID,
-		Status:  models.QueryStatusPending,
+		ID:             uuid.New(),
+		QueryID:        query.ID,
+		Status:         models.QueryStatusPending,
+		OrganizationID: orgID,
 	}
 	if err := db.DB.Create(&execution).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create execution"})
@@ -45,14 +49,14 @@ func RunQuery(c *gin.Context) {
 	// Get target agents
 	var agents []models.Agent
 	if len(req.AgentIDs) == 0 {
-		// All online agents
-		if err := db.DB.Where("state = ?", models.AgentStateConnected).Find(&agents).Error; err != nil {
+		// All online agents in org
+		if err := db.DB.Scopes(db.TenantScope(orgID)).Where("state = ?", models.AgentStateConnected).Find(&agents).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch agents"})
 			return
 		}
 	} else {
-		// Specific agents
-		if err := db.DB.Where("id IN ?", req.AgentIDs).Find(&agents).Error; err != nil {
+		// Specific agents in org
+		if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id IN ?", req.AgentIDs).Find(&agents).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch agents"})
 			return
 		}
@@ -61,10 +65,11 @@ func RunQuery(c *gin.Context) {
 	// Create execution results for each agent
 	for _, agent := range agents {
 		result := models.QueryExecutionResult{
-			ID:          uuid.New(),
-			ExecutionID: execution.ID,
-			AgentID:     agent.ID,
-			Status:      models.QueryStatusPending,
+			ID:             uuid.New(),
+			ExecutionID:    execution.ID,
+			AgentID:        agent.ID,
+			Status:         models.QueryStatusPending,
+			OrganizationID: orgID,
 		}
 		db.DB.Create(&result)
 	}
@@ -93,6 +98,8 @@ func RunLiveQuery(c *gin.Context) {
 		return
 	}
 
+	orgID, _ := utils.GetOrgID(c)
+
 	// Create a temporary query (saved to DB for FK constraint)
 	query := models.Query{
 		ID:       uuid.New(),
@@ -107,9 +114,10 @@ func RunLiveQuery(c *gin.Context) {
 
 	// Create execution record
 	execution := models.QueryExecution{
-		ID:      uuid.New(),
-		QueryID: query.ID,
-		Status:  models.QueryStatusPending,
+		ID:             uuid.New(),
+		QueryID:        query.ID,
+		Status:         models.QueryStatusPending,
+		OrganizationID: orgID,
 	}
 	if err := db.DB.Create(&execution).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create execution"})
@@ -119,32 +127,27 @@ func RunLiveQuery(c *gin.Context) {
 	// Get target agents
 	var agents []models.Agent
 	if len(req.AgentIDs) == 0 {
-		// All online agents
-		if err := db.DB.Where("state = ?", models.AgentStateConnected).Find(&agents).Error; err != nil {
+		// All online agents in org
+		if err := db.DB.Scopes(db.TenantScope(orgID)).Where("state = ?", models.AgentStateConnected).Find(&agents).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch agents"})
 			return
 		}
 	} else {
-		// Specific agents
-		if err := db.DB.Where("id IN ?", req.AgentIDs).Find(&agents).Error; err != nil {
+		// Specific agents in org
+		if err := db.DB.Scopes(db.TenantScope(orgID)).Where("id IN ?", req.AgentIDs).Find(&agents).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch agents"})
 			return
 		}
-	}
-
-	// Filter by platform if specified
-	if req.Platform != "" {
-		// Note: In a real implementation, you'd check agent OS
-		// For now, we'll run on all selected agents
 	}
 
 	// Create execution results for each agent
 	for _, agent := range agents {
 		result := models.QueryExecutionResult{
-			ID:          uuid.New(),
-			ExecutionID: execution.ID,
-			AgentID:     agent.ID,
-			Status:      models.QueryStatusPending,
+			ID:             uuid.New(),
+			ExecutionID:    execution.ID,
+			AgentID:        agent.ID,
+			Status:         models.QueryStatusPending,
+			OrganizationID: orgID,
 		}
 		db.DB.Create(&result)
 	}

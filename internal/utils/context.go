@@ -32,14 +32,32 @@ func GetUserID(c *gin.Context) (uuid.UUID, bool) {
 // GetOrgID extracts the organization ID from the Gin context.
 // Returns nil for super admins (cross-org access).
 func GetOrgID(c *gin.Context) (*uuid.UUID, bool) {
-	orgIDStr, exists := c.Get(ContextKeyOrgID)
+	orgIDVal, exists := c.Get(ContextKeyOrgID)
 	if !exists {
 		return nil, false
 	}
-	if orgIDStr == nil {
-		return nil, true // Super admin, no org scope
+	// Handle nil interface value (super admin with no org)
+	// Must check reflect-based nil since *string(nil) interface != nil
+	if orgIDVal == nil {
+		return nil, true
 	}
-	id, err := uuid.Parse(orgIDStr.(string))
+	// The value is stored as *string (pointer), convert to string safely
+	var orgIDStr string
+	switch v := orgIDVal.(type) {
+	case string:
+		orgIDStr = v
+	case *string:
+		if v == nil {
+			return nil, true
+		}
+		orgIDStr = *v
+	default:
+		return nil, false
+	}
+	if orgIDStr == "" {
+		return nil, true
+	}
+	id, err := uuid.Parse(orgIDStr)
 	if err != nil {
 		return nil, false
 	}

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	"openshield-manager/internal/middleware"
 	"openshield-manager/internal/models"
@@ -60,10 +61,18 @@ func RegisterUser(c *gin.Context) {
 		req.Role = models.UserRoleOrgViewer
 	}
 
-	var orgID *models.Organization
-	_ = orgID // placeholder
+	// Parse organization_id from request (optional)
+	var orgID *uuid.UUID
+	if req.OrgID != nil && *req.OrgID != "" {
+		parsed, err := uuid.Parse(*req.OrgID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid organization_id format"})
+			return
+		}
+		orgID = &parsed
+	}
 
-	user, err := service.RegisterUser(req.Email, req.Password, req.Name, req.Role, nil)
+	user, err := service.RegisterUser(req.Email, req.Password, req.Name, req.Role, orgID)
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return

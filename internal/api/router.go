@@ -27,10 +27,10 @@ func CreateRouter() *gin.Engine {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// SSE endpoints for real-time events
-	router.GET("/events/agents", events.HandleSSE)
-	router.GET("/events/tasks", events.HandleSSE)
-	router.GET("/events/queries", events.HandleSSE)
+	// SSE endpoints for real-time events (org-aware, authenticated)
+	router.GET("/events/agents", middleware.AuthMiddleware(), middleware.RequireOrgAccess(), events.HandleSSE)
+	router.GET("/events/tasks", middleware.AuthMiddleware(), middleware.RequireOrgAccess(), events.HandleSSE)
+	router.GET("/events/queries", middleware.AuthMiddleware(), middleware.RequireOrgAccess(), events.HandleSSE)
 
 	// External API routes
 	apiGroup := router.Group("/api")
@@ -66,11 +66,14 @@ func CreateRouter() *gin.Engine {
 			tools.POST("/execute", middleware.RequireRole(middleware.RoleOperator), ExecuteTool)
 		}
 		// Certificates endpoints
+		// Note: cert/sign uses agent token (X-Agent-Token) auth, not JWT,
+		// because agents don't have dashboard credentials during enrollment.
 		cert := apiGroup.Group("/certs")
-		cert.Use(middleware.AuthMiddleware(), middleware.RequireOrgAccess())
 		{
-			cert.POST("/sign", middleware.RequireRole(middleware.RoleOperator), SignAgentCSR)
+			cert.POST("/sign", SignAgentCSR)
 		}
+		// Also register at /cert/sign (singular) for backward compatibility
+		apiGroup.POST("/cert/sign", SignAgentCSR)
 		// Queries endpoints - FleetDM-style
 		queries := apiGroup.Group("/queries")
 		queries.Use(middleware.AuthMiddleware(), middleware.RequireOrgAccess())
@@ -119,6 +122,9 @@ func CreateRouter() *gin.Engine {
 
 		// Organization management endpoints
 		RegisterOrgRoutes(apiGroup)
+
+		// Registration token management endpoints
+		RegisterRegTokenRoutes(apiGroup)
 	}
 
 	return router

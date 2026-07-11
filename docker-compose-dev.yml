@@ -6,6 +6,7 @@ services:
     container_name: openshield-manager
     ports:
       - "9000:9000"
+      - "9001:9001"
       - "50052:50052"
       - "50053:50053"
     depends_on:
